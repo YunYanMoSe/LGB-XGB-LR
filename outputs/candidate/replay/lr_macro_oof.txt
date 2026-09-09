@@ -1,0 +1,4 @@
+# 对照：LR[balanced] v2 = AUC .8812 gAUC_w .8521 gAUC_m .8659
+LR[balanced] AUC=0.8812 gAUC_w=0.8521 gAUC_m=0.8659
+LR[macro] AUC=0.8813 gAUC_w=0.8530 gAUC_m=0.8669
+LR[macro_sp] AUC=0.8812 gAUC_w=0.8530 gAUC_m=0.8670

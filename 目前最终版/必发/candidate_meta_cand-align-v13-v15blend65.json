@@ -1,0 +1,9 @@
+{
+  "name": "cand-align-v13-v15blend65",
+  "desc": "0.65×v15(组长 submission) 秩 + 0.35×v6 秩 全局百分位融合",
+  "v15_board": 0.7845,
+  "v6_board": 0.7782,
+  "w_v15": 0.65,
+  "family": "cand-align-v13-v15blend",
+  "note": "60-85 峰区精扫（70=.7862 峰）"
+}

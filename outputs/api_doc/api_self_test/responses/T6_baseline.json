@@ -1,0 +1,121 @@
+{
+  "columns": [
+    {
+      "items": [
+        {
+          "buyers": 856,
+          "category": "家居装饰",
+          "code": "85123A",
+          "desc": "WHITE HANGING HEART T-LIGHT HOLDER",
+          "desc_zh": "奶油色悬挂心形茶烛台",
+          "hit": false,
+          "price": 2.95,
+          "rank": 1
+        },
+        {
+          "buyers": 708,
+          "category": "派对用品",
+          "code": "47566",
+          "desc": "PARTY BUNTING",
+          "desc_zh": "派对彩旗",
+          "hit": false,
+          "price": 4.95,
+          "rank": 2
+        },
+        {
+          "buyers": 640,
+          "category": "厨房用品",
+          "code": "22720",
+          "desc": "SET OF 3 CAKE TINS PANTRY DESIGN",
+          "desc_zh": "3件装蛋糕罐食品储藏室设计",
+          "hit": false,
+          "price": 4.95,
+          "rank": 3
+        }
+      ],
+      "name": "全局热门"
+    },
+    {
+      "items": [
+        {
+          "buyers": 472,
+          "category": "厨房用品",
+          "code": "23245",
+          "desc": "SET OF 3 REGENCY CAKE TINS",
+          "desc_zh": "3个摄政时期蛋糕罐套装",
+          "hit": false,
+          "price": 4.95,
+          "rank": 1
+        },
+        {
+          "buyers": 248,
+          "category": "厨房用品",
+          "code": "23173",
+          "desc": "REGENCY TEAPOT ROSES",
+          "desc_zh": "摄政风格玫瑰茶壶",
+          "hit": false,
+          "price": 9.95,
+          "rank": 2
+        },
+        {
+          "buyers": 224,
+          "category": "厨房用品",
+          "code": "23170",
+          "desc": "REGENCY TEA PLATE ROSES",
+          "desc_zh": "摄政风格玫瑰茶碟",
+          "hit": false,
+          "price": 1.65,
+          "rank": 3
+        }
+      ],
+      "name": "ItemCF 画像"
+    },
+    {
+      "items": [
+        {
+          "buyers": 250,
+          "category": "生活用品",
+          "code": "22619",
+          "desc": "SET OF 6 SOLDIER SKITTLES",
+          "desc_zh": "套装6个士兵造型保龄球",
+          "hit": false,
+          "price": 3.75,
+          "rank": 1
+        },
+        {
+          "buyers": 6,
+          "category": "",
+          "code": "84522",
+          "desc": "PINK PARTY SUNGLASSES",
+          "desc_zh": "PINK PARTY SUNGLASSES",
+          "hit": false,
+          "price": 1.95,
+          "rank": 2
+        },
+        {
+          "buyers": 856,
+          "category": "家居装饰",
+          "code": "85123A",
+          "desc": "WHITE HANGING HEART T-LIGHT HOLDER",
+          "desc_zh": "奶油色悬挂心形茶烛台",
+          "hit": false,
+          "price": 2.95,
+          "rank": 3
+        }
+      ],
+      "name": "融合召回(未精排)"
+    }
+  ],
+  "last_basket": [
+    "21890",
+    "21891",
+    "23355",
+    "84879"
+  ],
+  "user": {
+    "last_basket_zh": "传统木质跳绳、6个木制保龄球棉布袋装、保持冷静热水袋、彩色小鸟装饰品",
+    "n_invoices": 2,
+    "n_items": 19
+  },
+  "user_id": 13899
+}

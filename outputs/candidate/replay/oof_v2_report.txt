@@ -1,0 +1,8 @@
+# v2 OOF（44 特征 = 33 base + 11 v2；wide_v2_*；组=user×month；前月训练→后月预测）
+
+LGB[scale_pos] global_auc=0.8532  gAUC_w=0.8327  gAUC_m=0.8450  n_groups=1013.0000  hit@5=0.9450  prec@5=0.5625  rec@5=0.4886  hit@10=0.9715  prec@10=0.4342  rec@10=0.6419  hit@20=0.9796  prec@20=0.3038  rec@20=0.7683
+LGB[macro] global_auc=0.8676  gAUC_w=0.8428  gAUC_m=0.8556  n_groups=1013.0000  hit@5=0.9369  prec@5=0.5373  rec@5=0.4756  hit@10=0.9715  prec@10=0.4216  rec@10=0.6320  hit@20=0.9857  prec@20=0.3023  rec@20=0.7751
+LGB[macro_sp] global_auc=0.8542  gAUC_w=0.8286  gAUC_m=0.8415  n_groups=1013.0000  hit@5=0.9491  prec@5=0.5723  rec@5=0.4981  hit@10=0.9654  prec@10=0.4377  rec@10=0.6379  hit@20=0.9857  prec@20=0.3102  rec@20=0.7818
+LR[balanced] global_auc=0.8812  gAUC_w=0.8521  gAUC_m=0.8659  n_groups=1013.0000  hit@5=0.9185  prec@5=0.4371  rec@5=0.4023  hit@10=0.9511  prec@10=0.3430  rec@10=0.5482  hit@20=0.9796  prec@20=0.2586  rec@20=0.7052
+
+总耗时 161s

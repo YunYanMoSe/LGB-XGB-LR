@@ -1,0 +1,282 @@
+{
+  "task": "对『商品A→相似商品Top5』是否合理做人工标注：合理(主题成套/像搭配)/存疑/失败(无关)",
+  "method": "skip-gram",
+  "topk": 5,
+  "anchors": [
+    {
+      "code": "22423",
+      "desc": "REGENCY CAKESTAND 3 TIER",
+      "desc_zh": "摄政风格三层蛋糕架",
+      "category": "厨房用品",
+      "buyers": 881,
+      "orders": 1703,
+      "neighbors": [
+        {
+          "code": "22698",
+          "desc": "PINK REGENCY TEACUP AND SAUCER",
+          "desc_zh": "粉色摄政风格茶杯和茶碟",
+          "category": "厨房用品",
+          "buyers": 319,
+          "orders": 556,
+          "score": 0.5074
+        },
+        {
+          "code": "23253",
+          "desc": "16 PIECE CUTLERY SET PANTRY DESIGN",
+          "desc_zh": "16件餐具套装 食品储藏室设计",
+          "category": "厨房用品",
+          "buyers": 44,
+          "orders": 47,
+          "score": 0.4952
+        },
+        {
+          "code": "23172",
+          "desc": "REGENCY TEA PLATE PINK",
+          "desc_zh": "摄政风格粉色茶碟",
+          "category": "厨房用品",
+          "buyers": 160,
+          "orders": 224,
+          "score": 0.4852
+        },
+        {
+          "code": "23175",
+          "desc": "REGENCY MILK JUG PINK",
+          "desc_zh": "摄政风格粉色牛奶壶",
+          "category": "厨房用品",
+          "buyers": 206,
+          "orders": 272,
+          "score": 0.485
+        },
+        {
+          "code": "84711B",
+          "desc": "PINK OVAL SHAPE TRINKET BOX",
+          "desc_zh": "粉色椭圆形首饰盒",
+          "category": "收纳用品",
+          "buyers": 7,
+          "orders": 8,
+          "score": 0.4849
+        }
+      ]
+    },
+    {
+      "code": "85123A",
+      "desc": "WHITE HANGING HEART T-LIGHT HOLDER",
+      "desc_zh": "奶油色悬挂心形茶烛台",
+      "category": "家居装饰",
+      "buyers": 856,
+      "orders": 1978,
+      "neighbors": [
+        {
+          "code": "21332",
+          "desc": "MOROCCAN BEATEN METAL MIRROR",
+          "desc_zh": "摩洛哥锤打金属镜子",
+          "category": "家居装饰",
+          "buyers": 8,
+          "orders": 8,
+          "score": 0.4951
+        },
+        {
+          "code": "21692",
+          "desc": "SILVER LATTICE VANILLA CANDLE POT",
+          "desc_zh": "",
+          "category": "",
+          "buyers": 7,
+          "orders": 7,
+          "score": 0.484
+        },
+        {
+          "code": "21333",
+          "desc": "CLASSIC WHITE FRAME",
+          "desc_zh": "经典白色相框",
+          "category": "家居装饰",
+          "buyers": 15,
+          "orders": 15,
+          "score": 0.4839
+        },
+        {
+          "code": "21003",
+          "desc": "ROSE DU SUD CUSHION COVER",
+          "desc_zh": "南方玫瑰靠垫套",
+          "category": "家居装饰",
+          "buyers": 6,
+          "orders": 6,
+          "score": 0.4565
+        },
+        {
+          "code": "23135",
+          "desc": "SMALL ZINC HEART WALL ORGANISER",
+          "desc_zh": "小型锌制心形壁挂收纳",
+          "category": "收纳用品",
+          "buyers": 31,
+          "orders": 42,
+          "score": 0.4561
+        }
+      ]
+    },
+    {
+      "code": "47566",
+      "desc": "PARTY BUNTING",
+      "desc_zh": "派对彩旗",
+      "category": "派对用品",
+      "buyers": 708,
+      "orders": 1379,
+      "neighbors": [
+        {
+          "code": "22089",
+          "desc": "PAPER BUNTING VINTAGE PAISLEY",
+          "desc_zh": "复古佩斯利纸质彩旗",
+          "category": "派对用品",
+          "buyers": 142,
+          "orders": 180,
+          "score": 0.4564
+        },
+        {
+          "code": "84945",
+          "desc": "MULTI COLOUR SILVER T-LIGHT HOLDER",
+          "desc_zh": "多彩银色茶烛台",
+          "category": "家居装饰",
+          "buyers": 208,
+          "orders": 306,
+          "score": 0.4417
+        },
+        {
+          "code": "84816",
+          "desc": "DANISH ROSE BEDSIDE CABINET",
+          "desc_zh": "丹麦玫瑰床头柜",
+          "category": "家居装饰",
+          "buyers": 10,
+          "orders": 10,
+          "score": 0.4415
+        },
+        {
+          "code": "22088",
+          "desc": "PAPER BUNTING COLOURED LACE",
+          "desc_zh": "彩色蕾丝纸旗装饰",
+          "category": "派对用品",
+          "buyers": 115,
+          "orders": 169,
+          "score": 0.4393
+        },
+        {
+          "code": "22501",
+          "desc": "PICNIC BASKET WICKER LARGE",
+          "desc_zh": "大号藤编野餐篮",
+          "category": "生活用品",
+          "buyers": 187,
+          "orders": 257,
+          "score": 0.4375
+        }
+      ]
+    },
+    {
+      "code": "85099B",
+      "desc": "JUMBO BAG RED RETROSPOT",
+      "desc_zh": "红色复古斑点大号袋",
+      "category": "购物袋",
+      "buyers": 635,
+      "orders": 1600,
+      "neighbors": [
+        {
+          "code": "20711",
+          "desc": "JUMBO BAG TOYS",
+          "desc_zh": "玩具大号袋",
+          "category": "购物袋",
+          "buyers": 152,
+          "orders": 245,
+          "score": 0.5925
+        },
+        {
+          "code": "21930",
+          "desc": "JUMBO STORAGE BAG SKULLS",
+          "desc_zh": "大号骷髅头收纳袋",
+          "category": "收纳用品",
+          "buyers": 220,
+          "orders": 471,
+          "score": 0.5708
+        },
+        {
+          "code": "21929",
+          "desc": "JUMBO BAG PINK VINTAGE PAISLEY",
+          "desc_zh": "粉色复古佩斯利大号袋",
+          "category": "购物袋",
+          "buyers": 308,
+          "orders": 602,
+          "score": 0.559
+        },
+        {
+          "code": "23200",
+          "desc": "JUMBO BAG PEARS",
+          "desc_zh": "梨子图案大号袋",
+          "category": "购物袋",
+          "buyers": 262,
+          "orders": 470,
+          "score": 0.5508
+        },
+        {
+          "code": "20712",
+          "desc": "JUMBO BAG WOODLAND ANIMALS",
+          "desc_zh": "大号袋装林地动物",
+          "category": "购物袋",
+          "buyers": 248,
+          "orders": 492,
+          "score": 0.5498
+        }
+      ]
+    },
+    {
+      "code": "84879",
+      "desc": "ASSORTED COLOUR BIRD ORNAMENT",
+      "desc_zh": "彩色小鸟装饰品",
+      "category": "装饰品",
+      "buyers": 678,
+      "orders": 1375,
+      "neighbors": [
+        {
+          "code": "23037",
+          "desc": "CANDLE HOLDER SILVER MADELINE",
+          "desc_zh": "银色玛德琳烛台",
+          "category": "家居装饰",
+          "buyers": 17,
+          "orders": 18,
+          "score": 0.4797
+        },
+        {
+          "code": "23023",
+          "desc": "RIDGED BONNE JAM JAR T-LIGHT HOLDER",
+          "desc_zh": "波纹果酱罐小烛台",
+          "category": "家居装饰",
+          "buyers": 23,
+          "orders": 23,
+          "score": 0.4574
+        },
+        {
+          "code": "79406",
+          "desc": "FROSTED WHITE BASE",
+          "desc_zh": "磨砂白底座",
+          "category": "家居装饰",
+          "buyers": 6,
+          "orders": 6,
+          "score": 0.4521
+        },
+        {
+          "code": "22460",
+          "desc": "EMBOSSED GLASS TEALIGHT HOLDER",
+          "desc_zh": "浮雕玻璃茶烛台",
+          "category": "家居装饰",
+          "buyers": 118,
+          "orders": 162,
+          "score": 0.4508
+        },
+        {
+          "code": "21422",
+          "desc": "PORCELAIN ROSE SMALL",
+          "desc_zh": "瓷玫瑰小号",
+          "category": "装饰品",
+          "buyers": 32,
+          "orders": 46,
+          "score": 0.4295
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "item_id": "85123A",
+  "method": "item2vec",
+  "query": {
+    "buyers": 856,
+    "category": "家居装饰",
+    "code": "85123A",
+    "desc": "WHITE HANGING HEART T-LIGHT HOLDER",
+    "desc_zh": "奶油色悬挂心形茶烛台",
+    "price": 2.95
+  },
+  "similar": [
+    {
+      "buyers": 8,
+      "category": "家居装饰",
+      "code": "21332",
+      "desc": "MOROCCAN BEATEN METAL MIRROR",
+      "desc_zh": "摩洛哥锤打金属镜子",
+      "price": 12.75,
+      "rank": 1,
+      "score": 0.4951
+    },
+    {
+      "buyers": 7,
+      "category": "",
+      "code": "21692",
+      "desc": "SILVER LATTICE VANILLA CANDLE POT",
+      "desc_zh": "SILVER LATTICE VANILLA CANDLE POT",
+      "price": 3.75,
+      "rank": 2,
+      "score": 0.484
+    },
+    {
+      "buyers": 15,
+      "category": "家居装饰",
+      "code": "21333",
+      "desc": "CLASSIC WHITE FRAME",
+      "desc_zh": "经典白色相框",
+      "price": 2.95,
+      "rank": 3,
+      "score": 0.4839
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+# v6 冠军精挑（step .025；对照 v5=(lgb_macro,xgb_macro,lr)=.8710）
+
+== 二分量 eqXGB+eqLR（['xgb_macro_eq', 'lr_eq_l2_sp']）step0.025 top4 ==
+w=(0.375, 0.625)  AUC=0.8870 gAUC_w=0.8576 gAUC_m=0.8717
+w=(0.425, 0.575)  AUC=0.8875 gAUC_w=0.8577 gAUC_m=0.8717
+w=(0.4, 0.6)  AUC=0.8873 gAUC_w=0.8577 gAUC_m=0.8717
+w=(0.475, 0.525)  AUC=0.8878 gAUC_w=0.8579 gAUC_m=0.8716
+
+== 原LGB+eqXGB+eqLR（['lgb_macro', 'xgb_macro_eq', 'lr_eq_l2_sp']）step0.025 top4 ==
+w=(0.125, 0.3, 0.575)  AUC=0.8874 gAUC_w=0.8582 gAUC_m=0.8720
+w=(0.125, 0.275, 0.6)  AUC=0.8871 gAUC_w=0.8581 gAUC_m=0.8720
+w=(0.075, 0.325, 0.6)  AUC=0.8873 gAUC_w=0.8581 gAUC_m=0.8720
+w=(0.1, 0.325, 0.575)  AUC=0.8875 gAUC_w=0.8581 gAUC_m=0.8720
+
+== eq三分量（['lgb_macro_eq', 'xgb_macro_eq', 'lr_eq_l2_sp']）step0.025 top4 ==
+w=(0.1, 0.3, 0.6)  AUC=0.8872 gAUC_w=0.8580 gAUC_m=0.8721
+w=(0.15, 0.275, 0.575)  AUC=0.8872 gAUC_w=0.8579 gAUC_m=0.8720
+w=(0.175, 0.275, 0.55)  AUC=0.8872 gAUC_w=0.8579 gAUC_m=0.8720
+w=(0.2, 0.225, 0.575)  AUC=0.8868 gAUC_w=0.8578 gAUC_m=0.8720
+
+== 双XGB变体+eqLR（['xgb_macro', 'xgb_macro_eq', 'lr_eq_l2_sp']）step0.025 top4 ==
+w=(0.05, 0.475, 0.475)  AUC=0.8881 gAUC_w=0.8581 gAUC_m=0.8718
+w=(0.05, 0.3, 0.65)  AUC=0.8869 gAUC_w=0.8578 gAUC_m=0.8718
+w=(0.025, 0.5, 0.475)  AUC=0.8881 gAUC_w=0.8580 gAUC_m=0.8718
+w=(0.025, 0.35, 0.625)  AUC=0.8871 gAUC_w=0.8578 gAUC_m=0.8718
+
+== 原树+eqLR（['lgb_macro', 'xgb_macro', 'lr_eq_l2_sp']）step0.025 top4 ==
+w=(0.15, 0.15, 0.7)  AUC=0.8853 gAUC_w=0.8576 gAUC_m=0.8717
+w=(0.125, 0.15, 0.725)  AUC=0.8852 gAUC_w=0.8575 gAUC_m=0.8716
+w=(0.175, 0.125, 0.7)  AUC=0.8852 gAUC_w=0.8576 gAUC_m=0.8716
+w=(0.175, 0.15, 0.675)  AUC=0.8854 gAUC_w=0.8576 gAUC_m=0.8716
+
+== 原LR(1/√n)+eqXGB（['lgb_macro', 'xgb_macro_eq', 'lr']）step0.025 top4 ==
+w=(0.1, 0.35, 0.55)  AUC=0.8877 gAUC_w=0.8581 gAUC_m=0.8717
+w=(0.075, 0.35, 0.575)  AUC=0.8876 gAUC_w=0.8580 gAUC_m=0.8717
+w=(0.075, 0.375, 0.55)  AUC=0.8878 gAUC_w=0.8580 gAUC_m=0.8717
+w=(0.1, 0.3, 0.6)  AUC=0.8873 gAUC_w=0.8579 gAUC_m=0.8716
+
+== 全场 best gAUC_m=0.8721 w={'lgb_macro_eq': 0.1, 'xgb_macro_eq': 0.3, 'lr_eq_l2_sp': 0.6}（> .8710 → 产 v6 提交）==

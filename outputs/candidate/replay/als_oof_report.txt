@@ -1,0 +1,13 @@
+# ALS 隐因子 OOF（k=48, α=30.0, λ=5.0, 事件日≤5, 18 iter；Jul..Oct 187,730 行 / 正例 8,293）
+
+单 ALS：gAUC_m=0.5755  comp_m=0.30201
+  Spearman(ALS, lgb_macro_eq) = 0.343
+  Spearman(ALS, xgb_macro_eq) = 0.294
+  Spearman(ALS, lr_eq_l2_sp) = 0.310
+
+逐月：  2010-07: gAUC_m=nan comp_m=nan | 2010-08: gAUC_m=nan comp_m=nan | 2010-09: gAUC_m=nan comp_m=nan | 2010-10: gAUC_m=nan comp_m=nan
+4路融合 w=(0.05, 0.15, 0.5, 0.3)：gAUC_m=0.8464 comp_m=0.55097
+4路融合 w=(0.05, 0.14, 0.46, 0.35)：gAUC_m=0.8373 comp_m=0.54026
+4路融合 w=(0.05, 0.1, 0.35, 0.5)：gAUC_m=0.7973 comp_m=0.49917
+
+== 仅退化检查：corr 不≈1、gAUC 不太低、无崩顶 → 决定 serve ==

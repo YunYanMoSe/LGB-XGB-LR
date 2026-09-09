@@ -1,0 +1,29 @@
+# ===== Python =====
+venv/
+__pycache__/
+*.pyc
+
+# ===== 数据 / 模型（课程数据不随公开仓库分发）=====
+data/
+models/
+train_data/
+
+# 数据类中间产物（大体积，不入库）
+*.csv
+*.pkl
+*.npz
+*.zip
+*.gz
+*.parquet
+*.joblib
+*.npy
+
+# 组长文档的本地文字提取（非本人成果，不入库）
+outputs/candidate/_leader_pdf_text.txt
+
+# 二进制报告 / 临时
+*.docx
+*.pdf
+*.xlsx
+*.log
+*_whitelist_dump.txt

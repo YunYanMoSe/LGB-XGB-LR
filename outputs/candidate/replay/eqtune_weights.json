@@ -1,0 +1,16 @@
+{
+  "winner": "\u91cd\u8c03\u53c2",
+  "weights": {
+    "lgb:lb_base": 0.0,
+    "xgb:xb_d5": 0.4,
+    "lr:w2_a1.0_C3.0": 0.6
+  },
+  "auc": 0.8871234582408623,
+  "gAUC_w": 0.8579991100386962,
+  "gAUC_m": 0.8722390676270729,
+  "best_per_kind": {
+    "xgb": "xgb:xb_d5",
+    "lgb": "lgb:lb_base",
+    "lr": "lr:w2_a1.0_C3.0"
+  }
+}

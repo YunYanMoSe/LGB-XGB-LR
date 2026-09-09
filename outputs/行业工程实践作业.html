@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>交易数据 EDA 分析报告 · 优化版</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+:root {
+  --page:#f6f7fb; --surface:#ffffff; --ink:#14161c; --ink2:#4c5260; --muted:#8b90a0;
+  --grid:#e8eaf1; --axis:#c9cdd8; --border:rgba(20,22,28,.08);
+  --shadow:0 1px 3px rgba(20,22,28,.05), 0 4px 16px rgba(20,22,28,.05);
+  --accent:#3b6fe0; --accent2:#22a06b; --accent3:#e8863a;
+  --radius:14px;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--page); color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased; }
+.wrap { max-width:1200px; margin:0 auto; padding:28px 20px 60px; }
+header { display:flex; justify-content:space-between; align-items:flex-end; gap:14px; flex-wrap:wrap; }
+h1 { font-size:24px; font-weight:760; margin:0; letter-spacing:.2px; }
+h1 .dot { color:var(--accent); }
+.sub { color:var(--muted); font-size:12px; margin-top:7px; line-height:1.7; }
+.sub b { color:var(--ink2); font-weight:600; }
+.tbtn { border:1px solid var(--border); background:var(--surface); color:var(--muted);
+  font-size:12px; border-radius:9px; padding:5px 13px; cursor:pointer;
+  font-family:inherit; transition:all .15s; }
+.tbtn:hover { color:var(--ink2); border-color:var(--axis); background:color-mix(in srgb, var(--surface) 92%, var(--accent) 8%); }
+.tbtn.primary { color:#fff; background:var(--accent); border-color:var(--accent); }
+.tbtn.primary:hover { opacity:.9; color:#fff; }
+.head-actions { display:flex; gap:8px; flex-wrap:wrap; }
+
+.cards { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin:24px 0 10px; }
+.card { flex:1 1 158px; max-width:210px; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--radius); padding:18px 16px 14px;
+  text-align:center; box-shadow:var(--shadow); transition:transform .15s; }
+.card:hover { transform:translateY(-2px); }
+.card .label { color:var(--muted); font-size:12px; font-weight:600; letter-spacing:.5px; }
+.card .value { font-size:22px; font-weight:700; margin-top:9px;
+  font-variant-numeric:tabular-nums; letter-spacing:-.3px; }
+.card .note { color:var(--ink2); font-size:11.5px; margin-top:8px; line-height:1.5; }
+.card.hl { background:linear-gradient(160deg, var(--accent), #2b53b8); border-color:transparent; }
+.card.hl .label, .card.hl .note { color:rgba(255,255,255,.82); }
+.card.hl .value { color:#fff; }
+
+.insight-box { background:linear-gradient(135deg, rgba(59,111,224,.07), rgba(34,160,107,.05));
+  border:1px solid rgba(59,111,224,.18); border-radius:var(--radius);
+  padding:16px 20px; margin:16px 0 4px; }
+.insight-box h2 { font-size:14px; font-weight:700; margin:0 0 10px; color:var(--accent); }
+.insight-box ol { margin:0; padding-left:20px; }
+.insight-box li { font-size:12.5px; line-height:1.9; color:var(--ink2); }
+
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(470px,1fr)); gap:16px; margin-top:18px; }
+.panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px 16px 12px; box-shadow:var(--shadow); }
+.panel-head { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+.panel h2 { font-size:15px; font-weight:700; margin:0; }
+.p-sub { color:var(--muted); font-size:12px; margin:3px 0 8px; }
+.chart { width:100%; height:350px; }
+.wide { grid-column:1 / -1; }
+.wide .chart { height:330px; }
+.tbl { margin-top:12px; overflow-x:auto; border-top:1px dashed var(--grid); padding-top:10px; }
+.tbl table { border-collapse:collapse; font-size:12px; width:100%; }
+.tbl th, .tbl td { padding:7px 12px; text-align:right; border-bottom:1px solid var(--grid);
+  color:var(--ink2); white-space:nowrap; }
+.tbl th { color:var(--muted); font-weight:600; }
+.tbl td:first-child, .tbl th:first-child { text-align:left; }
+.tbl tr:hover td { background:color-mix(in srgb, var(--surface) 94%, var(--accent) 6%); }
+.code { font-family:ui-monospace,Consolas,monospace; background:color-mix(in srgb, var(--muted) 12%, transparent);
+  padding:1px 5px; border-radius:5px; color:var(--ink2); }
+.en { color:var(--muted); font-size:11px; display:block; max-width:230px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.badge { display:inline-block; padding:1px 7px; border-radius:20px; font-size:11px;
+  background:color-mix(in srgb, var(--accent) 10%, transparent); color:var(--accent); }
+.insight { margin-top:12px; padding:10px 14px; border-left:3px solid var(--accent);
+  background:color-mix(in srgb, var(--accent) 5%, var(--surface));
+  border-radius:0 10px 10px 0; font-size:12.5px; line-height:1.85; color:var(--ink2); }
+.insight .it { display:block; font-weight:700; color:var(--accent); font-size:12px; margin-bottom:3px; letter-spacing:.5px; }
+.insight b { color:var(--ink); font-weight:600; }
+
+.funnel { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:6px 2px; }
+.fstep { flex:1 1 150px; text-align:center; background:color-mix(in srgb, var(--accent) 5%, var(--surface));
+  border:1px solid var(--border); border-radius:10px; padding:10px 8px; }
+.fstep .n { font-size:16px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; }
+.fstep .l { font-size:11px; color:var(--muted); margin-top:3px; line-height:1.5; }
+.fstep .d { font-size:10.5px; color:var(--muted); margin-top:2px; }
+.farrow { color:var(--muted); font-size:16px; flex:0 0 auto; }
+.fretain { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.fretain .pill { flex:1 1 150px; background:color-mix(in srgb, var(--accent2) 8%, var(--surface));
+  border:1px solid rgba(34,160,107,.25); border-radius:10px; padding:9px 12px; text-align:center; }
+.fretain .pill b { display:block; font-size:15px; color:var(--accent2); }
+.fretain .pill span { font-size:11px; color:var(--muted); }
+footer { margin-top:36px; color:var(--muted); font-size:12px; text-align:center; line-height:1.9; }
+footer a { color:var(--muted); }
+.toast { position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(20px);
+  background:var(--ink); color:var(--surface); font-size:12.5px; padding:9px 18px; border-radius:10px;
+  opacity:0; pointer-events:none; transition:all .25s; z-index:99; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+@media (max-width:640px) {
+  .grid { grid-template-columns:1fr; }
+  .card { max-width:none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>交易数据 EDA 分析报告<span class="dot"> ·</span> 优化版</h1>
+      <div class="sub" id="sub-line"></div>
+    </div>
+    <div class="head-actions">
+      <button class="tbtn" id="printBtn" title="打印 / 导出 PDF">打印 / PDF</button>
+      <button class="tbtn" id="themeBtn" title="切换明暗主题">🌙 深色</button>
+    </div>
+  </header>
+
+  <section class="cards" id="metric-cards">
+    <div class="card"><div class="label">总行数</div><div class="value" id="m-rows">—</div><div class="note">交互记录总数</div></div>
+    <div class="card"><div class="label">唯一用户数</div><div class="value" id="m-users">—</div><div class="note">去重 CustomerID</div></div>
+    <div class="card"><div class="label">唯一商品数</div><div class="value" id="m-items">—</div><div class="note">去重 StockCode</div></div>
+    <div class="card"><div class="label">总销售额</div><div class="value" id="m-sales">—</div><div class="note" id="note-sales"></div></div>
+    <div class="card"><div class="label">平均客单价</div><div class="value" id="m-ao">—</div><div class="note" id="note-ao"></div></div>
+    <div class="card hl"><div class="label">清洗留存率</div><div class="value" id="m-retain">—</div><div class="note">原始 541,909 行 → 397,884 行</div></div>
+  </section>
+
+  <div class="insight-box">
+    <h2>关键洞察</h2>
+    <ol id="insight-list"></ol>
+  </div>
+
+  <div class="grid">
+    <div class="panel wide">
+      <div class="panel-head"><h2>数据清洗漏斗</h2><button class="tbtn" data-for="funnel">清洗明细</button></div>
+      <div class="p-sub">原始数据逐级清洗的留存过程（移除 144,025 行）</div>
+      <div id="chart-funnel" class="chart"></div>
+      <div class="fretain" id="fretain-box"></div>
+      <div class="insight"><span class="it">解读</span><p>原始数据共 <b>541,909</b> 行，经三级清洗后保留 <b>397,884</b> 行，整体留存率 <b>73.42%</b>。删除的 144,025 行中，<b>CustomerID 缺失</b>是最大质量问题（135,080 行，占原始数据的 24.93%）；取消/退货订单删除 8,905 行（2.19%）；无效价格仅 40 行。说明该数据集的主要脏数据来源是匿名访客，清洗后数据可直接用于用户-商品交互建模。</p></div>
+      <div class="tbl" id="tbl-funnel" hidden></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>各国订单量 Top 10</h2><button class="tbtn" data-for="countries">数据表</button></div>
+      <div class="p-sub">按发票去重统计订单数 · 数据表含中文国家名与占比</div>
+      <div id="chart-countries" class="chart"></div>
+      <div class="insight"><span class="it">解读</span><p>订单高度集中于英国：英国 <b>16,646 单</b>，占 Top10 国家合计（18,199 单）的 <b>91.5%</b>，占全部订单（18,532 单）的 <b>89.8%</b>；第二名德国仅 457 单，不足英国的 3%。这是一个以英国单一市场为主的数据集，做地域特征或跨市场对比时需要留意样本偏差。</p></div>
+      <div class="tbl" id="tbl-countries" hidden></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>热门商品交互占比 Top 10</h2><button class="tbtn" data-for="hot">数据表</button></div>
+      <div class="p-sub">各商品交互行数占全量比例（含其余商品）</div>
+      <div id="chart-hotpie" class="chart"></div>
+      <div class="insight"><span class="it">解读</span><p>Top10 商品合计交互 <b>14,958 次</b>，仅占全量 397,884 行的 <b>3.76%</b>，其余 383,926 行（96.49%）来自海量长尾商品。交互分布极度分散，说明用户偏好多元、冷门商品占比极高，恰好适合推荐系统通过协同过滤等方式挖掘长尾兴趣。</p></div>
+      <div class="tbl" id="tbl-hot" hidden></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>12月1日–9日 每日交易量趋势</h2><button class="tbtn" data-for="daily">数据表</button></div>
+      <div class="p-sub">2010-12-01 ~ 2010-12-09 · 按交互行数统计</div>
+      <div id="chart-daily" class="chart"></div>
+      <div class="insight"><span class="it">解读</span><p>12 月 1 日至 9 日期间，每日交易量在 <b>1,103~2,707 行</b>之间波动：<b>12 月 4 日（周六）交易量为 0</b>（当日无成交记录），<b>12 月 5 日（周日）冲高至 2,707 行</b>，随后回落至 1,100 行左右。周末呈现明显的先抑后扬形态，若构建时间序列特征，建议引入星期几变量。</p></div>
+      <div class="tbl" id="tbl-daily" hidden></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>销量最高的商品 Top 10</h2><button class="tbtn" data-for="qty">数据表</button></div>
+      <div class="p-sub">按 Quantity 数量合计排序</div>
+      <div id="chart-qty" class="chart"></div>
+      <div class="insight"><span class="it">解读</span><p>销量榜与交互榜结构不同：交互次数第一的 85123A 在销量榜仅排第 6。销量冠军 <b>23843（纸艺·小鸟造型）累计卖出 80,995 件</b>，头部 10 款商品合计贡献 <b>437,805 件</b>。上榜商品以低价小件（蛋糕纸杯、收纳罐、夜灯、爆米花桶等）为主，符合低客单、高频次的零售特征。</p></div>
+      <div class="tbl" id="tbl-qty" hidden></div>
+    </div>
+
+    <div class="panel wide">
+      <div class="panel-head"><h2>单价分布直方图</h2><button class="tbtn" data-for="hist">数据表</button></div>
+      <div class="p-sub">UnitPrice 分桶统计交互行数（长尾折叠到 50+）</div>
+      <div id="chart-price" class="chart"></div>
+      <div class="insight"><span class="it">解读</span><p>单价分布严重右偏：<b>72.7% 的交互（289,129 行）集中在 0~3 英镑区间</b>，其中 1~2 英镑最多（117,739 行）；5 英镑以上的交互合计约 12.9%（51,167 行），50+ 英镑的极高价商品仅 241 行。绝大多数商品属于 5 英镑以下的冲动消费品类，价格敏感度高，推荐时可结合价格带做分层策略。</p></div>
+      <div class="tbl" id="tbl-hist" hidden></div>
+    </div>
+  </div>
+
+  <footer>
+    数据来自 Online Retail 公开数据集 · 已完成三级清洗（删缺失用户 / 删取消退货 / 删无效价格），清洗后留存率 73.42%<br>
+    图表使用 <a href="https://echarts.apache.org/" target="_blank" rel="noopener">Apache ECharts</a> 渲染 · 明暗主题可点击右上角按钮切换 · 优化版于 2026-09-01 生成
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const R = {"source": "data/processed/clean_transactions.csv", "generated_at": "2026-09-01 11:06", "currency": "£", "metrics": {"total_rows": 397884, "unique_users": 4338, "unique_items": 3665, "orders": 18532, "total_sales": 8911407.9, "avg_order_value": 480.87}, "countries": {"names": ["United Kingdom", "Germany", "France", "EIRE", "Belgium", "Netherlands", "Spain", "Portugal", "Australia", "Switzerland"], "orders": [16646, 457, 389, 260, 98, 94, 90, 57, 57, 51]}, "hot": {"slices": [{"name": "85123A", "value": 2035, "desc": "WHITE HANGING HEART T-LIGHT HOLDER", "pct": 0.51}, {"name": "22423", "value": 1723, "desc": "REGENCY CAKESTAND 3 TIER", "pct": 0.43}, {"name": "85099B", "value": 1618, "desc": "JUMBO BAG RED RETROSPOT", "pct": 0.41}, {"name": "84879", "value": 1408, "desc": "ASSORTED COLOUR BIRD ORNAMENT", "pct": 0.35}, {"name": "47566", "value": 1396, "desc": "PARTY BUNTING", "pct": 0.35}, {"name": "20725", "value": 1317, "desc": "LUNCH BAG RED RETROSPOT", "pct": 0.33}, {"name": "22720", "value": 1159, "desc": "SET OF 3 CAKE TINS PANTRY DESIGN ", "pct": 0.29}, {"name": "20727", "value": 1105, "desc": "LUNCH BAG  BLACK SKULL.", "pct": 0.28}, {"name": "POST", "value": 1099, "desc": "", "pct": 0.28}, {"name": "23203", "value": 1098, "desc": "JUMBO BAG DOILEY PATTERNS", "pct": 0.28}, {"name": "其余", "value": 383926, "desc": "Top10 之外的全部商品", "pct": 96.49}]}, "daily": {"dates": ["12/01", "12/02", "12/03", "12/04", "12/05", "12/06", "12/07", "12/08", "12/09"], "counts": [1942, 2000, 1103, 0, 2707, 1945, 1110, 1948, 1749]}, "qty": {"names": ["23843", "23166", "84077", "22197", "85099B", "85123A", "84879", "21212", "23084", "22492"], "values": [80995, 77916, 54415, 49183, 46181, 36782, 35362, 33693, 27202, 26076], "descs": ["PAPER CRAFT , LITTLE BIRDIE", "MEDIUM CERAMIC TOP STORAGE JAR", "WORLD WAR 2 GLIDERS ASSTD DESIGNS", "SMALL POPCORN HOLDER", "JUMBO BAG RED RETROSPOT", "WHITE HANGING HEART T-LIGHT HOLDER", "ASSORTED COLOUR BIRD ORNAMENT", "PACK OF 72 RETROSPOT CAKE CASES", "RABBIT NIGHT LIGHT", "MINI PAINT SET VINTAGE "]}, "hist": {"labels": ["0~1", "1~2", "2~3", "3~4", "4~5", "5~7", "7~10", "10~15", "15~20", "20~50", "50+"], "counts": [93056, 117739, 78334, 25153, 32435, 15559, 24745, 7364, 2379, 879, 241]}, "tables": {"countries": {"headers": ["国家", "订单数"], "rows": [["United Kingdom", 16646], ["Germany", 457], ["France", 389], ["EIRE", 260], ["Belgium", 98], ["Netherlands", 94], ["Spain", 90], ["Portugal", 57], ["Australia", 57], ["Switzerland", 51]]}, "hot": {"headers": ["商品ID", "商品名称", "交互次数", "占比"], "rows": [["85123A", "WHITE HANGING HEART T-LIGHT HOLDER", 2035, "0.51%"], ["22423", "REGENCY CAKESTAND 3 TIER", 1723, "0.43%"], ["85099B", "JUMBO BAG RED RETROSPOT", 1618, "0.41%"], ["84879", "ASSORTED COLOUR BIRD ORNAMENT", 1408, "0.35%"], ["47566", "PARTY BUNTING", 1396, "0.35%"], ["20725", "LUNCH BAG RED RETROSPOT", 1317, "0.33%"], ["22720", "SET OF 3 CAKE TINS PANTRY DESIGN ", 1159, "0.29%"], ["20727", "LUNCH BAG  BLACK SKULL.", 1105, "0.28%"], ["POST", "-", 1099, "0.28%"], ["23203", "JUMBO BAG DOILEY PATTERNS", 1098, "0.28%"], ["其余", "Top10 之外的全部商品", 383926, "96.49%"]]}, "daily": {"headers": ["日期", "交易量（行）"], "rows": [["12/01", 1942], ["12/02", 2000], ["12/03", 1103], ["12/04", 0], ["12/05", 2707], ["12/06", 1945], ["12/07", 1110], ["12/08", 1948], ["12/09", 1749]]}, "qty": {"headers": ["商品ID", "商品名称", "销量合计"], "rows": [["23843", "PAPER CRAFT , LITTLE BIRDIE", 80995], ["23166", "MEDIUM CERAMIC TOP STORAGE JAR", 77916], ["84077", "WORLD WAR 2 GLIDERS ASSTD DESIGNS", 54415], ["22197", "SMALL POPCORN HOLDER", 49183], ["85099B", "JUMBO BAG RED RETROSPOT", 46181], ["85123A", "WHITE HANGING HEART T-LIGHT HOLDER", 36782], ["84879", "ASSORTED COLOUR BIRD ORNAMENT", 35362], ["21212", "PACK OF 72 RETROSPOT CAKE CASES", 33693], ["23084", "RABBIT NIGHT LIGHT", 27202], ["22492", "MINI PAINT SET VINTAGE ", 26076]]}, "hist": {"headers": ["单价区间", "交易行数"], "rows": [["0~1", 93056], ["1~2", 117739], ["2~3", 78334], ["3~4", 25153], ["4~5", 32435], ["5~7", 15559], ["7~10", 24745], ["10~15", 7364], ["15~20", 2379], ["20~50", 879], ["50+", 241]]}}};
+const FUNNEL = {"raw": 541909, "stages": [{"name": "原始数据", "desc": "Online Retail 原始行", "after": 541909, "removed": 0, "pct": 0.0}, {"name": "一级·删缺失用户", "desc": "CustomerID 缺失", "after": 406829, "removed": 135080, "pct": 24.93}, {"name": "二级·删取消退货", "desc": "InvoiceNo 以 C 开头 / Quantity<=0", "after": 397924, "removed": 8905, "pct": 2.19}, {"name": "三级·删无效价格", "desc": "UnitPrice <= 0", "after": 397884, "removed": 40, "pct": 0.01}], "retain": 73.4227};
+const HOT_ROWS = [["<code class=\"code\">85123A</code>", "<span class=\"en\">WHITE HANGING HEART T-LIGHT HOLDER</span>", "白色悬挂心形茶烛台", "家居装饰", "2,035", 0.51], ["<code class=\"code\">22423</code>", "<span class=\"en\">REGENCY CAKESTAND 3 TIER</span>", "摄政风格三层蛋糕架", "厨房用品", "1,723", 0.43], ["<code class=\"code\">85099B</code>", "<span class=\"en\">JUMBO BAG RED RETROSPOT</span>", "红色复古斑点大号袋", "购物袋", "1,618", 0.41], ["<code class=\"code\">84879</code>", "<span class=\"en\">ASSORTED COLOUR BIRD ORNAMENT</span>", "彩色小鸟装饰品", "装饰品", "1,408", 0.35], ["<code class=\"code\">47566</code>", "<span class=\"en\">PARTY BUNTING</span>", "派对彩旗", "派对用品", "1,396", 0.35], ["<code class=\"code\">20725</code>", "<span class=\"en\">LUNCH BAG RED RETROSPOT</span>", "红色波点午餐袋", "厨房用品", "1,317", 0.33], ["<code class=\"code\">22720</code>", "<span class=\"en\">SET OF 3 CAKE TINS PANTRY DESIGN </span>", "3件装蛋糕罐食品储藏室设计", "厨房用品", "1,159", 0.29], ["<code class=\"code\">20727</code>", "<span class=\"en\">LUNCH BAG  BLACK SKULL.</span>", "黑色骷髅午餐袋", "购物袋", "1,105", 0.28], ["<code class=\"code\">POST</code>", "<span class=\"en\"></span>", "&lt;未匹配&gt;", "-", "1,099", 0.28], ["<code class=\"code\">23203</code>", "<span class=\"en\">JUMBO BAG DOILEY PATTERNS</span>", "镂空图案大号袋", "购物袋", "1,098", 0.28]];
+const QTY_ROWS = [["<code class=\"code\">23843</code>", "<span class=\"en\">PAPER CRAFT , LITTLE BIRDIE</span>", "纸艺·小鸟造型", "手工材料", "80,995"], ["<code class=\"code\">23166</code>", "<span class=\"en\">MEDIUM CERAMIC TOP STORAGE JAR</span>", "中号陶瓷收纳罐", "家居收纳", "77,916"], ["<code class=\"code\">84077</code>", "<span class=\"en\">WORLD WAR 2 GLIDERS ASSTD DESIGNS</span>", "二战滑翔机模型组合", "玩具模型", "54,415"], ["<code class=\"code\">22197</code>", "<span class=\"en\">SMALL POPCORN HOLDER</span>", "小号爆米花桶", "厨房用品", "49,183"], ["<code class=\"code\">85099B</code>", "<span class=\"en\">JUMBO BAG RED RETROSPOT</span>", "红色复古斑点大号袋", "购物袋", "46,181"], ["<code class=\"code\">85123A</code>", "<span class=\"en\">WHITE HANGING HEART T-LIGHT HOLDER</span>", "白色悬挂心形茶烛台", "家居装饰", "36,782"], ["<code class=\"code\">84879</code>", "<span class=\"en\">ASSORTED COLOUR BIRD ORNAMENT</span>", "彩色小鸟装饰品", "装饰品", "35,362"], ["<code class=\"code\">21212</code>", "<span class=\"en\">PACK OF 72 RETROSPOT CAKE CASES</span>", "72只装复古波点蛋糕纸杯", "厨房用品", "33,693"], ["<code class=\"code\">23084</code>", "<span class=\"en\">RABBIT NIGHT LIGHT</span>", "兔子小夜灯", "家居装饰", "27,202"], ["<code class=\"code\">22492</code>", "<span class=\"en\">MINI PAINT SET VINTAGE </span>", "复古迷你颜料套装", "文具", "26,076"]];
+const COUNTRIES_ROWS = [["英国", "<span class=\"en\">United Kingdom</span>", "16,646", 89.82], ["德国", "<span class=\"en\">Germany</span>", "457", 2.47], ["法国", "<span class=\"en\">France</span>", "389", 2.1], ["爱尔兰", "<span class=\"en\">EIRE</span>", "260", 1.4], ["比利时", "<span class=\"en\">Belgium</span>", "98", 0.53], ["荷兰", "<span class=\"en\">Netherlands</span>", "94", 0.51], ["西班牙", "<span class=\"en\">Spain</span>", "90", 0.49], ["葡萄牙", "<span class=\"en\">Portugal</span>", "57", 0.31], ["澳大利亚", "<span class=\"en\">Australia</span>", "57", 0.31], ["瑞士", "<span class=\"en\">Switzerland</span>", "51", 0.28]];
+const COUNTRIES_SLICES = [{"name": "United Kingdom", "value": 16646, "desc": "英国", "pct": 89.82}, {"name": "Germany", "value": 457, "desc": "德国", "pct": 2.47}, {"name": "France", "value": 389, "desc": "法国", "pct": 2.1}, {"name": "EIRE", "value": 260, "desc": "爱尔兰", "pct": 1.4}, {"name": "Belgium", "value": 98, "desc": "比利时", "pct": 0.53}, {"name": "Netherlands", "value": 94, "desc": "荷兰", "pct": 0.51}, {"name": "Spain", "value": 90, "desc": "西班牙", "pct": 0.49}, {"name": "Portugal", "value": 57, "desc": "葡萄牙", "pct": 0.31}, {"name": "Australia", "value": 57, "desc": "澳大利亚", "pct": 0.31}, {"name": "Switzerland", "value": 51, "desc": "瑞士", "pct": 0.28}];
+const INSIGHTS = ["整体留存率 73.42%，共清洗 144,025 行（约占 26.58%），其中缺失用户是最大数据质量问题来源（占原始数据 24.93%）。", "退货/取消订单占比低（2.19%），说明原始交易记录质量总体较好；无效价格仅 40 行，可忽略。", "市场高度集中于英国：英国订单 16,646 单，占 Top10 国家合计的 91.5%（占总订单 89.8%）；第二名的德国仅 457 单。", "热门商品交互极度长尾：Top10 商品合计仅占总交互的 3.76%，适合推荐系统挖掘长尾偏好。", "销量冠军 23843（纸艺·小鸟造型）累计卖出 80,995 件，是第 10 名 22492（26,076 件）的 3.1 倍。", "单价分布高度右偏：约 72.7% 的交互集中在 0~3 英镑区间，50+ 英镑的高价商品仅 241 行。"];
+
+const THEMES = {
+  light: {
+    page:'#f6f7fb', surface:'#ffffff', ink:'#14161c', ink2:'#4c5260', muted:'#8b90a0',
+    grid:'#e8eaf1', axis:'#c9cdd8', border:'rgba(20,22,28,0.08)',
+    shadow:'0 1px 3px rgba(20,22,28,0.05), 0 4px 16px rgba(20,22,28,0.05)',
+    cat:['#3b6fe0','#e8863a','#22a06b','#e0a93a','#d55181','#008300','#7a5ce0','#e34948'],
+    pie10:['#3b6fe0','#e8863a','#22a06b','#e0a93a','#d55181','#7a5ce0','#e34948','#0f9d8f','#c96a2e','#5b8c2a'],
+    lb1:'#9cc0f2', lb2:'#d6e6fc', rest:'#c9cdd8',
+    line:'#3b6fe0', area:'rgba(59,111,224,0.16)',
+    accent:'#3b6fe0', accent2:'#22a06b', badge:'rgba(59,111,224,0.10)'
+  },
+  dark: {
+    page:'#0d0f13', surface:'#181b22', ink:'#eef0f4', ink2:'#c3c7d1', muted:'#8b90a0',
+    grid:'#262a33', axis:'#343a46', border:'rgba(255,255,255,0.09)',
+    shadow:'0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.35)',
+    cat:['#4d82ec','#e8863a','#1fae77','#dba43a','#d55181','#008300','#9185ec','#e66767'],
+    pie10:['#4d82ec','#e8863a','#1fae77','#dba43a','#d55181','#9185ec','#e66767','#2bb3a4','#d67a3c','#74a53d'],
+    lb1:'#9cc0f2', lb2:'#d6e6fc', rest:'#343a46',
+    line:'#4d82ec', area:'rgba(77,130,236,0.22)',
+    accent:'#4d82ec', accent2:'#22c086', badge:'rgba(77,130,236,0.18)'
+  }
+};
+
+let themeKey = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+let manualTheme = false;
+let charts = {};
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(function(){ el.classList.remove('show'); }, 1800);
+}
+
+function applyTheme(t) {
+  const s = document.documentElement.style;
+  const map = { '--page':t.page, '--surface':t.surface, '--ink':t.ink, '--ink2':t.ink2, '--muted':t.muted,
+    '--grid':t.grid, '--axis':t.axis, '--border':t.border, '--shadow':t.shadow, '--accent':t.accent, '--accent2':t.accent2 };
+  Object.keys(map).forEach(function(k){ s.setProperty(k, map[k]); });
+}
+
+function mkTooltip(t) {
+  return { backgroundColor:t.surface, borderColor:t.border, borderWidth:1, padding:[8,12],
+    textStyle:{ color:t.ink, fontSize:12 }, extraCssText:'border-radius:8px; box-shadow:'+t.shadow+';' };
+}
+function baseGrid() { return { left:8, right:16, top:34, bottom:8, containLabel:true }; }
+function xCat(t, data, rotate) {
+  return { type:'category', data:data, boundaryGap:true,
+    axisLine:{ lineStyle:{ color:t.axis } }, axisTick:{ show:false },
+    axisLabel:{ color:t.muted, fontSize:11, interval:0, rotate:rotate||0 } };
+}
+function yVal(t, name) {
+  return { type:'value', name:name||'', nameTextStyle:{ color:t.muted, fontSize:11 },
+    axisLine:{ show:false }, axisTick:{ show:false },
+    axisLabel:{ color:t.muted, fontSize:11 }, splitLine:{ lineStyle:{ color:t.grid } } };
+}
+
+function barChart(t, el, opt) {
+  charts[el] = echarts.init(document.getElementById(el), null, { renderer:'canvas' });
+  charts[el].setOption({
+    color:[t.cat[0]],
+    tooltip: Object.assign(mkTooltip(t), {
+      trigger:'axis', axisPointer:{ type:'shadow' },
+      formatter: function(ps){
+        const p = ps[0];
+        const d = opt.descs ? opt.descs[p.dataIndex] : '';
+        return '<b>'+p.axisValueLabel+'</b>'+(d?' · '+d:'')+'<br/>'+opt.name+': '+p.value.toLocaleString('en-US');
+      }
+    }),
+    grid: baseGrid(),
+    xAxis: Object.assign(xCat(t, opt.names, opt.xRot||0), { boundaryGap:true }),
+    yAxis: yVal(t, opt.yName),
+    series:[{
+      name:opt.name, type:'bar', data:opt.values, barMaxWidth:30,
+      itemStyle:{ color:t.cat[0], borderRadius:[4,4,0,0] },
+      label:{ show:opt.showLabel!==false, position:'top', color:t.ink2, fontSize:11,
+        formatter:function(p){ return p.value.toLocaleString('en-US'); } },
+      animationDuration:600, animationEasing:'cubicOut'
+    }]
+  });
+}
+
+function lineChart(t, el, opt) {
+  charts[el] = echarts.init(document.getElementById(el), null, { renderer:'canvas' });
+  charts[el].setOption({
+    color:[t.line],
+    tooltip: Object.assign(mkTooltip(t), {
+      trigger:'axis',
+      axisPointer:{ type:'cross', crossStyle:{ color:t.axis }, label:{ backgroundColor:t.axis, color:t.surface } }
+    }),
+    grid: baseGrid(),
+    xAxis: Object.assign(xCat(t, opt.names), { boundaryGap:false }),
+    yAxis: yVal(t, opt.yName),
+    series:[{
+      name:opt.name, type:'line', data:opt.values, symbolSize:8, smooth:false,
+      lineStyle:{ width:2, color:t.line },
+      itemStyle:{ color:t.line, borderColor:t.surface, borderWidth:1 },
+      areaStyle:{ color:{ type:'linear', x:0, y:0, x2:0, y2:1,
+        colorStops:[{ offset:0, color:t.area }, { offset:1, color:'transparent' }] } },
+      animationDuration:700, animationEasing:'cubicOut'
+    }]
+  });
+}
+
+function pieChart(t, el, slices, opt) {
+  opt = opt || {};
+  const vName = opt.valueName || '交互次数';
+  const colors = t.pie10.concat([t.rest]);
+  charts[el] = echarts.init(document.getElementById(el), null, { renderer:'canvas' });
+  charts[el].setOption({
+    tooltip: Object.assign(mkTooltip(t), {
+      trigger:'item',
+      formatter: function(p){
+        const d = p.data;
+        return (d.desc?'<b>'+d.desc+'</b><br/>':'')+'<b>'+p.name+'</b><br/>'+vName+': '+
+          p.value.toLocaleString('en-US')+'<br/>占比: '+(typeof d.pct==='number'?d.pct.toFixed(2):'0.00')+'%';
+      }
+    }),
+    legend:{ type:'scroll', orient:'vertical', right:0, top:'middle',
+      textStyle:{ color:t.ink2, fontSize:11 }, itemWidth:10, itemHeight:10, icon:'circle' },
+    series:[{
+      type:'pie', radius:['34%','70%'], center:['40%','50%'],
+      data:slices, color:colors,
+      label:{ color:t.ink2, fontSize:11, formatter:'{b}\n{d}%' },
+      labelLine:{ length:12, length2:8, lineStyle:{ color:t.axis, width:1 } },
+      itemStyle:{ borderColor:t.surface, borderWidth:2 },
+      emphasis:{ scaleSize:5, label:{ fontSize:12 } },
+      animationType:'scale', animationDuration:700, animationEasing:'cubicOut'
+    }]
+  });
+}
+
+function funnelChart(t, el) {
+  charts[el] = echarts.init(document.getElementById(el), null, { renderer:'canvas' });
+  const data = FUNNEL.stages.map(function(s, i){
+    return { name:s.name, value:s.after, desc:s.desc, removed:s.removed, pct:s.pct, idx:i };
+  });
+  charts[el].setOption({
+    tooltip: Object.assign(mkTooltip(t), {
+      trigger:'item',
+      formatter: function(p){
+        const d = p.data;
+        let h = '<b>'+d.name+'</b> · 留存 '+p.value.toLocaleString('en-US')+' 行';
+        if (d.removed>0) h += '<br/>本级删除: '+d.removed.toLocaleString('en-US')+' 行 ('+d.pct.toFixed(2)+'%)';
+        return h + '<br/><span style="color:'+t.muted+'">'+d.desc+'</span>';
+      }
+    }),
+    grid:{ left:10, right:30, top:40, bottom:10, containLabel:true },
+    xAxis:{ type:'value', show:false, max: function(v){ return v.max*1.08; } },
+    yAxis:{ type:'category', data:data.map(function(d){ return d.name; }), inverse:true,
+      axisLine:{ show:false }, axisTick:{ show:false },
+      axisLabel:{ color:t.ink2, fontSize:12, formatter:function(v, i){ return v+'　'; } } },
+    series:[{
+      type:'funnel', left:'12%', right:'26%', top:12, bottom:10,
+      minSize:'34%', maxSize:'100%', sort:'none', gap:2,
+      label:{ position:'right', color:t.ink2, fontSize:12, formatter:function(p){ return p.value.toLocaleString('en-US'); } },
+      labelLine:{ show:false },
+      itemStyle:{ borderColor:t.surface, borderWidth:2 },
+      emphasis:{ label:{ fontSize:13, fontWeight:700 } },
+      data:data.map(function(d){
+        return Object.assign({}, d, { itemStyle:{ color:[t.cat[0], t.cat[1], t.cat[2], t.cat[3]][d.idx] } });
+      })
+    }]
+  });
+}
+
+function renderTable(id) {
+  let tab, html = '';
+  if (id === 'countries') {
+    html = '<table><thead><tr><th>国家（中文）</th><th>国家（英文）</th><th>订单数</th><th>占总订单比</th></tr></thead><tbody>';
+    html += COUNTRIES_ROWS.map(function(r){
+      return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3].toFixed(2)+'%</td></tr>';
+    }).join('');
+    html += '</tbody></table>';
+  } else if (id === 'hot') {
+    html = '<table><thead><tr><th>商品ID</th><th>商品名称（英文）</th><th>中文名称</th><th>分类</th><th>交互次数</th><th>占比</th></tr></thead><tbody>';
+    html += HOT_ROWS.map(function(r){
+      return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5].toFixed(2)+'%</td></tr>';
+    }).join('');
+    html += '</tbody></table>';
+  } else if (id === 'qty') {
+    html = '<table><thead><tr><th>商品ID</th><th>商品名称（英文）</th><th>中文名称</th><th>分类</th><th>销量合计</th></tr></thead><tbody>';
+    html += QTY_ROWS.map(function(r){
+      return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td></tr>';
+    }).join('');
+    html += '</tbody></table>';
+  } else if (id === 'funnel') {
+    html = '<table><thead><tr><th>阶段</th><th>说明</th><th>留存行数</th><th>本级删除</th><th>删除占比</th></tr></thead><tbody>';
+    html += FUNNEL.stages.map(function(s){
+      return '<tr><td>'+s.name+'</td><td>'+s.desc+'</td><td>'+s.after.toLocaleString('en-US')+'</td><td>'+
+        (s.removed? s.removed.toLocaleString('en-US') : '-')+'</td><td>'+(s.pct? s.pct.toFixed(2)+'%' : '-')+'</td></tr>';
+    }).join('');
+    html += '<tr><td><b>最终留存</b></td><td>清洗后数据集</td><td><b>397,884</b></td><td colspan="2">留存率 73.42%</td></tr></tbody></table>';
+  } else {
+    tab = R.tables[id];
+    html = '<table><thead><tr>';
+    html += tab.headers.map(function(h){ return '<th>'+h+'</th>'; }).join('');
+    html += '</tr></thead><tbody>';
+    html += tab.rows.map(function(r){
+      return '<tr>'+r.map(function(c){ return '<td>'+c+'</td>'; }).join('')+'</tr>';
+    }).join('');
+    html += '</tbody></table>';
+  }
+  const box = document.getElementById('tbl-'+id);
+  box.innerHTML = html;
+  box.hidden = !box.hidden;
+}
+
+function renderAll() {
+  const t = THEMES[themeKey];
+  applyTheme(t);
+  Object.keys(charts).forEach(function(k){ try{ charts[k].dispose(); }catch(e){} });
+  charts = {};
+
+  const m = R.metrics;
+  document.getElementById('m-rows').textContent = m.total_rows.toLocaleString('en-US');
+  document.getElementById('m-users').textContent = m.unique_users.toLocaleString('en-US');
+  document.getElementById('m-items').textContent = m.unique_items.toLocaleString('en-US');
+  document.getElementById('m-sales').textContent = R.currency + Math.round(m.total_sales).toLocaleString('en-US');
+  document.getElementById('m-ao').textContent = R.currency + m.avg_order_value.toFixed(2);
+  document.getElementById('note-sales').textContent = 'Quantity × UnitPrice 合计（'+R.currency+'）';
+  document.getElementById('note-ao').textContent = '总销售额 ÷ 订单数（'+m.orders.toLocaleString('en-US')+' 单）';
+  document.getElementById('m-retain').textContent = FUNNEL.retain.toFixed(2) + '%';
+  document.getElementById('sub-line').innerHTML =
+    '数据源: <b>'+R.source+'</b> · 生成时间: '+R.generated_at+' · 共 '+m.total_rows.toLocaleString('en-US')+' 行 / '+m.orders.toLocaleString('en-US')+' 张订单';
+
+  const il = document.getElementById('insight-list');
+  il.innerHTML = INSIGHTS.map(function(s){ return '<li>'+s+'</li>'; }).join('');
+
+  const fb = document.getElementById('fretain-box');
+  fb.innerHTML = '<div class="pill"><b>73.42%</b><span>总体留存率</span></div>' +
+    '<div class="pill"><b>144,025</b><span>累计删除行数</span></div>' +
+    '<div class="pill"><b>24.93%</b><span>最大质量问题：缺失用户</span></div>';
+
+  funnelChart(t, 'chart-funnel');
+  pieChart(t, 'chart-countries', COUNTRIES_SLICES, { valueName:'订单数' });
+  pieChart(t, 'chart-hotpie', R.hot.slices);
+  lineChart(t, 'chart-daily', { names:R.daily.dates, values:R.daily.counts, name:'交易量', yName:'交易量（行）' });
+  barChart(t, 'chart-qty', { names:R.qty.names, values:R.qty.values, name:'销量合计', descs:R.qty.descs });
+  barChart(t, 'chart-price', { names:R.hist.labels, values:R.hist.counts, name:'交易行数', yName:'行数' });
+
+  document.getElementById('themeBtn').textContent = themeKey==='dark' ? '☀️ 浅色' : '🌙 深色';
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    themeKey = themeKey==='dark' ? 'light' : 'dark';
+    manualTheme = true;
+    renderAll();
+    toast('已切换到'+(themeKey==='dark'?'深色':'浅色')+'主题');
+  });
+  document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+    if (!manualTheme) { themeKey = e.matches ? 'dark' : 'light'; renderAll(); }
+  });
+  window.addEventListener('resize', function(){
+    Object.keys(charts).forEach(function(k){ charts[k].resize(); });
+  });
+  document.querySelectorAll('.tbtn[data-for]').forEach(function(btn){
+    btn.addEventListener('click', function(){ renderTable(btn.getAttribute('data-for')); });
+  });
+  renderAll();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# v4 融合选权（wide_v2；组件=lgb_macro/lgb_macro_sp/lr_last2）
+
+单 lgb_macro: AUC=0.8676 gAUC_w=0.8428 gAUC_m=0.8556
+单 lgb_macro_sp: AUC=0.8542 gAUC_w=0.8286 gAUC_m=0.8415
+单 lr: AUC=0.8810 gAUC_w=0.8539 gAUC_m=0.8684
+
+== 按 gAUC_m top6 ==
+w=(0.2, 0.0, 0.8)  AUC=0.8839 gAUC_w=0.8562 gAUC_m=0.8703
+w=(0.15, 0.05, 0.8)  AUC=0.8838 gAUC_w=0.8561 gAUC_m=0.8702
+w=(0.15, 0.0, 0.85)  AUC=0.8835 gAUC_w=0.8560 gAUC_m=0.8702
+w=(0.3, 0.0, 0.7)  AUC=0.8840 gAUC_w=0.8563 gAUC_m=0.8702
+w=(0.25, 0.0, 0.75)  AUC=0.8840 gAUC_w=0.8562 gAUC_m=0.8702
+w=(0.1, 0.1, 0.8)  AUC=0.8837 gAUC_w=0.8560 gAUC_m=0.8701
+
+== top1 组合 w=(0.2, 0.0, 0.8) 逐用户 top-k ==
+rec@5=0.4344  rec@10=0.5832  hit@5=0.9267  hit@10=0.9654  prec@10=0.3735

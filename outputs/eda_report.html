@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>交易数据 EDA 分析报告</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+:root {
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+  --shadow:0 1px 4px rgba(11,11,11,0.07);
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--page); color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased; }
+.wrap { max-width:1180px; margin:0 auto; padding:26px 18px 56px; }
+header { display:flex; justify-content:space-between; align-items:flex-end; gap:14px; flex-wrap:wrap; }
+h1 { font-size:23px; font-weight:720; margin:0; letter-spacing:.2px; }
+.sub { color:var(--muted); font-size:12px; margin-top:6px; }
+.sub b { color:var(--ink2); font-weight:600; }
+.tbtn { border:1px solid var(--border); background:var(--surface); color:var(--muted);
+  font-size:12px; border-radius:8px; padding:5px 12px; cursor:pointer;
+  font-family:inherit; transition:color .15s, border-color .15s; }
+.tbtn:hover { color:var(--ink2); border-color:var(--axis); }
+
+.cards { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin:22px 0 26px; }
+.card { flex:1 1 172px; max-width:215px; background:var(--surface);
+  border:1px solid var(--border); border-radius:14px; padding:18px 16px 14px;
+  text-align:center; box-shadow:var(--shadow); }
+.card .label { color:var(--muted); font-size:12px; font-weight:600; letter-spacing:.5px; }
+.card .value { font-size:22px; font-weight:680; margin-top:9px;
+  font-variant-numeric:tabular-nums; letter-spacing:-.3px; }
+.card .note { color:var(--ink2); font-size:12px; margin-top:8px; }
+
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(460px,1fr)); gap:16px; }
+.panel { background:var(--surface); border:1px solid var(--border); border-radius:14px;
+  padding:16px 16px 12px; box-shadow:var(--shadow); }
+.panel-head { display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+.panel h2 { font-size:15px; font-weight:680; margin:0; }
+.p-sub { color:var(--muted); font-size:12px; margin:3px 0 10px; }
+.chart { width:100%; height:350px; }
+.wide { grid-column:1 / -1; }
+.wide .chart { height:320px; }
+.tbl { margin-top:12px; overflow-x:auto; }
+.tbl table { border-collapse:collapse; font-size:12px; width:100%; }
+.tbl th, .tbl td { padding:6px 12px; text-align:right; border-bottom:1px solid var(--grid);
+  color:var(--ink2); white-space:nowrap; }
+.tbl th { color:var(--muted); font-weight:600; }
+.tbl td:first-child, .tbl th:first-child { text-align:left; }
+footer { margin-top:34px; color:var(--muted); font-size:12px; text-align:center; line-height:1.8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>交易数据 EDA 分析报告</h1>
+      <div class="sub" id="sub-line"></div>
+    </div>
+    <button class="tbtn" id="themeBtn" title="切换明暗主题">🌙 深色</button>
+  </header>
+
+  <section class="cards">
+    <div class="card"><div class="label">总行数</div><div class="value" id="m-rows">—</div><div class="note">交互记录总数</div></div>
+    <div class="card"><div class="label">唯一用户数</div><div class="value" id="m-users">—</div><div class="note">去重 CustomerID</div></div>
+    <div class="card"><div class="label">唯一商品数</div><div class="value" id="m-items">—</div><div class="note">去重 StockCode</div></div>
+    <div class="card"><div class="label">总销售额</div><div class="value" id="m-sales">—</div><div class="note" id="note-sales">Quantity × UnitPrice 合计</div></div>
+    <div class="card"><div class="label">平均客单价</div><div class="value" id="m-ao">—</div><div class="note" id="note-ao">总销售额 ÷ 订单数</div></div>
+  </section>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-head"><h2>各国订单量 Top 10</h2><button class="tbtn" data-for="countries">数据表</button></div>
+      <div class="p-sub">按发票去重统计订单数</div>
+      <div id="chart-countries" class="chart"></div>
+      <div class="tbl" id="tbl-countries" hidden></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>热门商品交互占比 Top 10</h2><button class="tbtn" data-for="hot">数据表</button></div>
+      <div class="p-sub">各商品交互行数占全量比例（含其余商品）</div>
+      <div id="chart-hotpie" class="chart"></div>
+      <div class="tbl" id="tbl-hot" hidden></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>12月1日–9日 每日交易量趋势</h2><button class="tbtn" data-for="daily">数据表</button></div>
+      <div class="p-sub">2010-12-01 ~ 2010-12-09 · 按交互行数统计</div>
+      <div id="chart-daily" class="chart"></div>
+      <div class="tbl" id="tbl-daily" hidden></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>销量最高的商品 Top 10</h2><button class="tbtn" data-for="qty">数据表</button></div>
+      <div class="p-sub">按 Quantity 数量合计排序</div>
+      <div id="chart-qty" class="chart"></div>
+      <div class="tbl" id="tbl-qty" hidden></div>
+    </div>
+
+    <div class="panel wide">
+      <div class="panel-head"><h2>单价分布直方图</h2><button class="tbtn" data-for="hist">数据表</button></div>
+      <div class="p-sub">UnitPrice 分桶统计交互行数（长尾折叠到 50+）</div>
+      <div id="chart-price" class="chart"></div>
+      <div class="tbl" id="tbl-hist" hidden></div>
+    </div>
+  </div>
+
+  <footer>
+    数据来自 Online Retail 公开数据集 · 已完成三级清洗（删缺失用户 / 删取消退货 / 删无效价格）<br>
+    图表使用 <a href="https://echarts.apache.org/" target="_blank" rel="noopener">Apache ECharts</a> 渲染 · 明暗主题可点击右上角按钮切换
+  </footer>
+</div>
+
+<script>
+const R = {"source": "data/processed/clean_transactions.csv", "generated_at": "2026-09-01 11:06", "currency": "£", "metrics": {"total_rows": 397884, "unique_users": 4338, "unique_items": 3665, "orders": 18532, "total_sales": 8911407.9, "avg_order_value": 480.87}, "countries": {"names": ["United Kingdom", "Germany", "France", "EIRE", "Belgium", "Netherlands", "Spain", "Portugal", "Australia", "Switzerland"], "orders": [16646, 457, 389, 260, 98, 94, 90, 57, 57, 51]}, "hot": {"slices": [{"name": "85123A", "value": 2035, "desc": "WHITE HANGING HEART T-LIGHT HOLDER", "pct": 0.51}, {"name": "22423", "value": 1723, "desc": "REGENCY CAKESTAND 3 TIER", "pct": 0.43}, {"name": "85099B", "value": 1618, "desc": "JUMBO BAG RED RETROSPOT", "pct": 0.41}, {"name": "84879", "value": 1408, "desc": "ASSORTED COLOUR BIRD ORNAMENT", "pct": 0.35}, {"name": "47566", "value": 1396, "desc": "PARTY BUNTING", "pct": 0.35}, {"name": "20725", "value": 1317, "desc": "LUNCH BAG RED RETROSPOT", "pct": 0.33}, {"name": "22720", "value": 1159, "desc": "SET OF 3 CAKE TINS PANTRY DESIGN ", "pct": 0.29}, {"name": "20727", "value": 1105, "desc": "LUNCH BAG  BLACK SKULL.", "pct": 0.28}, {"name": "POST", "value": 1099, "desc": "", "pct": 0.28}, {"name": "23203", "value": 1098, "desc": "JUMBO BAG DOILEY PATTERNS", "pct": 0.28}, {"name": "其余", "value": 383926, "desc": "Top10 之外的全部商品", "pct": 96.49}]}, "daily": {"dates": ["12/01", "12/02", "12/03", "12/04", "12/05", "12/06", "12/07", "12/08", "12/09"], "counts": [1942, 2000, 1103, 0, 2707, 1945, 1110, 1948, 1749]}, "qty": {"names": ["23843", "23166", "84077", "22197", "85099B", "85123A", "84879", "21212", "23084", "22492"], "values": [80995, 77916, 54415, 49183, 46181, 36782, 35362, 33693, 27202, 26076], "descs": ["PAPER CRAFT , LITTLE BIRDIE", "MEDIUM CERAMIC TOP STORAGE JAR", "WORLD WAR 2 GLIDERS ASSTD DESIGNS", "SMALL POPCORN HOLDER", "JUMBO BAG RED RETROSPOT", "WHITE HANGING HEART T-LIGHT HOLDER", "ASSORTED COLOUR BIRD ORNAMENT", "PACK OF 72 RETROSPOT CAKE CASES", "RABBIT NIGHT LIGHT", "MINI PAINT SET VINTAGE "]}, "hist": {"labels": ["0~1", "1~2", "2~3", "3~4", "4~5", "5~7", "7~10", "10~15", "15~20", "20~50", "50+"], "counts": [93056, 117739, 78334, 25153, 32435, 15559, 24745, 7364, 2379, 879, 241]}, "tables": {"countries": {"headers": ["国家", "订单数"], "rows": [["United Kingdom", 16646], ["Germany", 457], ["France", 389], ["EIRE", 260], ["Belgium", 98], ["Netherlands", 94], ["Spain", 90], ["Portugal", 57], ["Australia", 57], ["Switzerland", 51]]}, "hot": {"headers": ["商品ID", "商品名称", "交互次数", "占比"], "rows": [["85123A", "WHITE HANGING HEART T-LIGHT HOLDER", 2035, "0.51%"], ["22423", "REGENCY CAKESTAND 3 TIER", 1723, "0.43%"], ["85099B", "JUMBO BAG RED RETROSPOT", 1618, "0.41%"], ["84879", "ASSORTED COLOUR BIRD ORNAMENT", 1408, "0.35%"], ["47566", "PARTY BUNTING", 1396, "0.35%"], ["20725", "LUNCH BAG RED RETROSPOT", 1317, "0.33%"], ["22720", "SET OF 3 CAKE TINS PANTRY DESIGN ", 1159, "0.29%"], ["20727", "LUNCH BAG  BLACK SKULL.", 1105, "0.28%"], ["POST", "-", 1099, "0.28%"], ["23203", "JUMBO BAG DOILEY PATTERNS", 1098, "0.28%"], ["其余", "Top10 之外的全部商品", 383926, "96.49%"]]}, "daily": {"headers": ["日期", "交易量（行）"], "rows": [["12/01", 1942], ["12/02", 2000], ["12/03", 1103], ["12/04", 0], ["12/05", 2707], ["12/06", 1945], ["12/07", 1110], ["12/08", 1948], ["12/09", 1749]]}, "qty": {"headers": ["商品ID", "商品名称", "销量合计"], "rows": [["23843", "PAPER CRAFT , LITTLE BIRDIE", 80995], ["23166", "MEDIUM CERAMIC TOP STORAGE JAR", 77916], ["84077", "WORLD WAR 2 GLIDERS ASSTD DESIGNS", 54415], ["22197", "SMALL POPCORN HOLDER", 49183], ["85099B", "JUMBO BAG RED RETROSPOT", 46181], ["85123A", "WHITE HANGING HEART T-LIGHT HOLDER", 36782], ["84879", "ASSORTED COLOUR BIRD ORNAMENT", 35362], ["21212", "PACK OF 72 RETROSPOT CAKE CASES", 33693], ["23084", "RABBIT NIGHT LIGHT", 27202], ["22492", "MINI PAINT SET VINTAGE ", 26076]]}, "hist": {"headers": ["单价区间", "交易行数"], "rows": [["0~1", 93056], ["1~2", 117739], ["2~3", 78334], ["3~4", 25153], ["4~5", 32435], ["5~7", 15559], ["7~10", 24745], ["10~15", 7364], ["15~20", 2379], ["20~50", 879], ["50+", 241]]}}};
+
+const THEMES = {
+  light: {
+    page:'#f9f9f7', surface:'#fcfcfb', ink:'#0b0b0b', ink2:'#52514e', muted:'#898781',
+    grid:'#e1e0d9', axis:'#c3c2b7', border:'rgba(11,11,11,0.10)',
+    shadow:'0 1px 4px rgba(11,11,11,0.07)',
+    cat:['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300','#4a3aa7','#e34948'],
+    lb1:'#86b6ef', lb2:'#cde2fb', rest:'#898781',
+    line:'#2a78d6', area:'rgba(42,120,214,0.16)'
+  },
+  dark: {
+    page:'#0d0d0d', surface:'#1a1a19', ink:'#ffffff', ink2:'#c3c2b7', muted:'#898781',
+    grid:'#2c2c2a', axis:'#383835', border:'rgba(255,255,255,0.10)',
+    shadow:'0 1px 4px rgba(0,0,0,0.45)',
+    cat:['#3987e5','#d95926','#199e70','#c98500','#d55181','#008300','#9085e9','#e66767'],
+    lb1:'#86b6ef', lb2:'#cde2fb', rest:'#898781',
+    line:'#3987e5', area:'rgba(57,135,229,0.22)'
+  }
+};
+
+let themeKey = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+let manualTheme = false;
+let charts = {};
+
+function applyTheme(t) {
+  const s = document.documentElement.style;
+  s.setProperty('--page', t.page); s.setProperty('--surface', t.surface);
+  s.setProperty('--ink', t.ink); s.setProperty('--ink2', t.ink2);
+  s.setProperty('--muted', t.muted); s.setProperty('--grid', t.grid);
+  s.setProperty('--axis', t.axis); s.setProperty('--border', t.border);
+  s.setProperty('--shadow', t.shadow);
+}
+
+function mkTooltip(t) {
+  return { backgroundColor:t.surface, borderColor:t.border, borderWidth:1, padding:[8,12],
+    textStyle:{ color:t.ink, fontSize:12 }, extraCssText:'border-radius:8px; box-shadow:'+t.shadow+';' };
+}
+function baseGrid() { return { left:8, right:16, top:32, bottom:8, containLabel:true }; }
+function xCat(t, data, rotate) {
+  return { type:'category', data:data, boundaryGap:true,
+    axisLine:{ lineStyle:{ color:t.axis } }, axisTick:{ show:false },
+    axisLabel:{ color:t.muted, fontSize:11, interval:0, rotate:rotate||0 } };
+}
+function yVal(t, name) {
+  return { type:'value', name:name||'', nameTextStyle:{ color:t.muted, fontSize:11 },
+    axisLine:{ show:false }, axisTick:{ show:false },
+    axisLabel:{ color:t.muted, fontSize:11 }, splitLine:{ lineStyle:{ color:t.grid } } };
+}
+
+function barChart(t, el, opt) {
+  charts[el] = echarts.init(document.getElementById(el), null, { renderer:'canvas' });
+  charts[el].setOption({
+    color:[t.cat[0]],
+    tooltip: Object.assign(mkTooltip(t), {
+      trigger:'axis', axisPointer:{ type:'shadow' },
+      formatter: function(ps){
+        const p = ps[0];
+        const d = opt.descs ? opt.descs[p.dataIndex] : '';
+        return '<b>'+p.axisValueLabel+'</b>'+(d?' · '+d:'')+'<br/>'+opt.name+': '+p.value.toLocaleString('en-US');
+      }
+    }),
+    grid: baseGrid(),
+    xAxis: Object.assign(xCat(t, opt.names, opt.xRot||0), { boundaryGap:true }),
+    yAxis: yVal(t, opt.yName),
+    series:[{
+      name:opt.name, type:'bar', data:opt.values, barMaxWidth:30,
+      itemStyle:{ color:t.cat[0], borderRadius:[4,4,0,0] },
+      label:{ show:true, position:'top', color:t.ink2, fontSize:11,
+        formatter:function(p){ return p.value.toLocaleString('en-US'); } }
+    }]
+  });
+}
+
+function lineChart(t, el, opt) {
+  charts[el] = echarts.init(document.getElementById(el), null, { renderer:'canvas' });
+  charts[el].setOption({
+    color:[t.line],
+    tooltip: Object.assign(mkTooltip(t), {
+      trigger:'axis',
+      axisPointer:{ type:'cross', crossStyle:{ color:t.axis }, label:{ backgroundColor:t.axis, color:t.surface } }
+    }),
+    grid: baseGrid(),
+    xAxis: Object.assign(xCat(t, opt.names), { boundaryGap:false }),
+    yAxis: yVal(t, opt.yName),
+    series:[{
+      name:opt.name, type:'line', data:opt.values, symbolSize:8,
+      lineStyle:{ width:2, color:t.line },
+      itemStyle:{ color:t.line, borderColor:t.surface, borderWidth:1 },
+      areaStyle:{ color:{ type:'linear', x:0, y:0, x2:0, y2:1,
+        colorStops:[{ offset:0, color:t.area }, { offset:1, color:'transparent' }] } }
+    }]
+  });
+}
+
+function pieChart(t, el, slices) {
+  const colors = t.cat.concat([t.lb1, t.lb2, t.rest]);
+  charts[el] = echarts.init(document.getElementById(el), null, { renderer:'canvas' });
+  charts[el].setOption({
+    tooltip: Object.assign(mkTooltip(t), {
+      trigger:'item',
+      formatter: function(p){
+        const d = p.data;
+        return (d.desc?'<b>'+d.desc+'</b><br/>':'')+'<b>'+p.name+'</b><br/>交互次数: '+
+          p.value.toLocaleString('en-US')+'<br/>占比: '+(typeof d.pct==='number'?d.pct.toFixed(2):'0.00')+'%';
+      }
+    }),
+    legend:{ type:'scroll', orient:'vertical', right:0, top:'middle',
+      textStyle:{ color:t.ink2, fontSize:11 }, itemWidth:10, itemHeight:10, icon:'circle' },
+    series:[{
+      type:'pie', radius:['34%','70%'], center:['40%','50%'],
+      data:slices, color:colors,
+      label:{ color:t.ink2, fontSize:11, formatter:'{b}\n{d}%' },
+      labelLine:{ length:12, length2:8, lineStyle:{ color:t.axis, width:1 } },
+      itemStyle:{ borderColor:t.surface, borderWidth:2 },
+      emphasis:{ scaleSize:5, label:{ fontSize:12 } }
+    }]
+  });
+}
+
+function renderTable(id) {
+  const tab = R.tables[id];
+  let html = '<table><thead><tr>';
+  html += tab.headers.map(function(h){ return '<th>'+h+'</th>'; }).join('');
+  html += '</tr></thead><tbody>';
+  html += tab.rows.map(function(r){
+    return '<tr>'+r.map(function(c){ return '<td>'+c+'</td>'; }).join('')+'</tr>';
+  }).join('');
+  html += '</tbody></table>';
+  const box = document.getElementById('tbl-'+id);
+  box.innerHTML = html;
+  box.hidden = !box.hidden;
+}
+
+function renderAll() {
+  const t = THEMES[themeKey];
+  applyTheme(t);
+  Object.keys(charts).forEach(function(k){ try{ charts[k].dispose(); }catch(e){} });
+  charts = {};
+
+  const m = R.metrics;
+  document.getElementById('m-rows').textContent = m.total_rows.toLocaleString('en-US');
+  document.getElementById('m-users').textContent = m.unique_users.toLocaleString('en-US');
+  document.getElementById('m-items').textContent = m.unique_items.toLocaleString('en-US');
+  document.getElementById('m-sales').textContent = R.currency + Math.round(m.total_sales).toLocaleString('en-US');
+  document.getElementById('m-ao').textContent = R.currency + m.avg_order_value.toFixed(2);
+  document.getElementById('note-sales').textContent = 'Quantity × UnitPrice 合计（'+R.currency+'）';
+  document.getElementById('note-ao').textContent = '总销售额 ÷ 订单数（'+m.orders.toLocaleString('en-US')+' 单）';
+  document.getElementById('sub-line').innerHTML =
+    '数据源: <b>'+R.source+'</b> · 生成时间: '+R.generated_at+' · 共 '+m.total_rows.toLocaleString('en-US')+' 行 / '+m.orders.toLocaleString('en-US')+' 张订单';
+
+  barChart(t, 'chart-countries', { names:R.countries.names, values:R.countries.orders, name:'订单数', xRot:28 });
+  pieChart(t, 'chart-hotpie', R.hot.slices);
+  lineChart(t, 'chart-daily', { names:R.daily.dates, values:R.daily.counts, name:'交易量', yName:'交易量（行）' });
+  barChart(t, 'chart-qty', { names:R.qty.names, values:R.qty.values, name:'销量合计', descs:R.qty.descs });
+  barChart(t, 'chart-price', { names:R.hist.labels, values:R.hist.counts, name:'交易行数', yName:'行数' });
+
+  document.getElementById('themeBtn').textContent = themeKey==='dark' ? '☀️ 浅色' : '🌙 深色';
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    themeKey = themeKey==='dark' ? 'light' : 'dark';
+    manualTheme = true;
+    renderAll();
+  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+    if (!manualTheme) { themeKey = e.matches ? 'dark' : 'light'; renderAll(); }
+  });
+  window.addEventListener('resize', function(){
+    Object.keys(charts).forEach(function(k){ charts[k].resize(); });
+  });
+  document.querySelectorAll('.tbtn[data-for]').forEach(function(btn){
+    btn.addEventListener('click', function(){ renderTable(btn.getAttribute('data-for')); });
+  });
+  renderAll();
+});
+</script>
+</body>
+</html>

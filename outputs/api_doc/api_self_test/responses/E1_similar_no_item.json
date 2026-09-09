@@ -1,0 +1,3 @@
+{
+  "error": "缺少 item_id 参数，例如 /similar?item_id=85123A&topn=5"
+}

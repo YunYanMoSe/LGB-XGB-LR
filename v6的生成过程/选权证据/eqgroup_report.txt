@@ -1,0 +1,28 @@
+# 组等权 OOF（wide_v2；1/√n → 1/n_group 对照）
+
+单 lgb_macro     : AUC=0.8676 gAUC_w=0.8428 gAUC_m=0.8556
+单 xgb_macro     : AUC=0.8786 gAUC_w=0.8459 gAUC_m=0.8586
+单 lr            : AUC=0.8810 gAUC_w=0.8539 gAUC_m=0.8684
+单 lgb_macro_eq  : AUC=0.8678 gAUC_w=0.8402 gAUC_m=0.8535
+单 xgb_macro_eq  : AUC=0.8852 gAUC_w=0.8536 gAUC_m=0.8665
+单 lr_eq_l2      : AUC=0.8771 gAUC_w=0.8496 gAUC_m=0.8636
+单 lr_eq_l2_sp   : AUC=0.8808 gAUC_w=0.8540 gAUC_m=0.8687
+
+== 三分量组等权（对照 v5=.8710） top4 ==
+w=(0.1, 0.3, 0.6)  AUC=0.8872 gAUC_w=0.8580 gAUC_m=0.8721
+w=(0.2, 0.25, 0.55)  AUC=0.8870 gAUC_w=0.8578 gAUC_m=0.8719
+w=(0.15, 0.3, 0.55)  AUC=0.8874 gAUC_w=0.8579 gAUC_m=0.8719
+w=(0.15, 0.25, 0.6)  AUC=0.8870 gAUC_w=0.8578 gAUC_m=0.8719
+
+== 树保持 1/√n、LR 组等权 top4 ==
+w=(0.15, 0.15, 0.7)  AUC=0.8853 gAUC_w=0.8576 gAUC_m=0.8717
+w=(0.2, 0.1, 0.7)  AUC=0.8850 gAUC_w=0.8575 gAUC_m=0.8715
+w=(0.15, 0.1, 0.75)  AUC=0.8848 gAUC_w=0.8573 gAUC_m=0.8715
+w=(0.1, 0.2, 0.7)  AUC=0.8856 gAUC_w=0.8575 gAUC_m=0.8714
+
+== 树组等权、LR 保持 macro_sp last2 top4 ==
+w=(0.1, 0.3, 0.6)  AUC=0.8873 gAUC_w=0.8576 gAUC_m=0.8715
+w=(0.05, 0.35, 0.6)  AUC=0.8874 gAUC_w=0.8576 gAUC_m=0.8715
+w=(0.1, 0.35, 0.55)  AUC=0.8877 gAUC_w=0.8576 gAUC_m=0.8714
+w=(0.0, 0.5, 0.5)  AUC=0.8880 gAUC_w=0.8577 gAUC_m=0.8714
+

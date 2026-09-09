@@ -1,0 +1,12 @@
+{
+  "components": [
+    "lgb_macro",
+    "lgb_macro_sp",
+    "lr"
+  ],
+  "weights": {
+    "lgb_macro": 0.2,
+    "lgb_macro_sp": 0.0,
+    "lr": 0.8
+  }
+}

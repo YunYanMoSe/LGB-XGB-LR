@@ -1,0 +1,554 @@
+{
+  "stage": "stage7_feature_engineering",
+  "protocol": "特征期=InvoiceDate<2011-11-09；标签窗=尾随30天[2011-11-09, 2011-12-09]；正样本=标签窗首购；负样本=配对1:3（全数据集未购买∩特征期目录）",
+  "feat_cut": "2011-11-09",
+  "seed": 42,
+  "min_fp_orders": 2,
+  "neg_ratio": 3,
+  "feature_period": {
+    "rows": 331431,
+    "orders": 15733,
+    "users": 4067,
+    "items": 3624
+  },
+  "label_period": {
+    "rows": 66453,
+    "users": 1667
+  },
+  "n_candidates": 2518,
+  "n_pos": 21159,
+  "n_neg": 63477,
+  "actual_neg_per_pos": 3.0,
+  "n_sample_users": 1033,
+  "n_item_map": 3657,
+  "n_feature_cols": 31,
+  "features": [
+    {
+      "name": "u_n_orders_log",
+      "zh": "用户历史订单数(log1p)",
+      "group": "A 用户画像"
+    },
+    {
+      "name": "u_n_items_log",
+      "zh": "用户历史去重购买商品数(log1p)",
+      "group": "A 用户画像"
+    },
+    {
+      "name": "u_qty_log",
+      "zh": "用户历史总购买件数(log1p)",
+      "group": "A 用户画像"
+    },
+    {
+      "name": "u_spend_log",
+      "zh": "用户历史总消费金额(log1p)",
+      "group": "A 用户画像"
+    },
+    {
+      "name": "u_avg_unit_price_log",
+      "zh": "用户历史自购商品均价(log1p)",
+      "group": "A 用户画像"
+    },
+    {
+      "name": "u_avg_basket_size_log",
+      "zh": "用户平均每单商品种数(log1p)",
+      "group": "A 用户画像"
+    },
+    {
+      "name": "u_active_days_log",
+      "zh": "用户历史活跃购买天数(log1p)",
+      "group": "A 用户画像"
+    },
+    {
+      "name": "u_last_active_gap_log",
+      "zh": "距切窗最近一次购买间隔天数(log1p，0=非常近)",
+      "group": "A 用户画像"
+    },
+    {
+      "name": "u_weekend_ratio",
+      "zh": "用户周末下单占比(0~1)",
+      "group": "A 用户画像"
+    },
+    {
+      "name": "u_cat_entropy",
+      "zh": "用户购买类目集中度熵(归一化)",
+      "group": "A 用户画像"
+    },
+    {
+      "name": "i_pop_buyers_log",
+      "zh": "商品热度：特征期购买用户数(log1p)",
+      "group": "B 商品·统计·时间"
+    },
+    {
+      "name": "i_pop_orders_log",
+      "zh": "商品特征期被购订单数(log1p)",
+      "group": "B 商品·统计·时间"
+    },
+    {
+      "name": "i_qty_log",
+      "zh": "商品特征期总销量(log1p)",
+      "group": "B 商品·统计·时间"
+    },
+    {
+      "name": "i_price_log",
+      "zh": "商品特征期单价中位数(log1p)",
+      "group": "B 商品·统计·时间"
+    },
+    {
+      "name": "i_pop_rank_frac",
+      "zh": "商品热门排名位置(0=最热→1=最冷)",
+      "group": "B 商品·统计·时间"
+    },
+    {
+      "name": "i_first_gap_log",
+      "zh": "商品上架时间：首销距今间隔(log1p，值大=老品)",
+      "group": "B 商品·统计·时间"
+    },
+    {
+      "name": "i_last_gap_log",
+      "zh": "商品滞销程度：最近销售距今间隔(log1p，值大=久未售)",
+      "group": "B 商品·统计·时间"
+    },
+    {
+      "name": "i_cat_sales_log",
+      "zh": "所属类目特征期销售额(log1p)",
+      "group": "B 商品·统计·时间"
+    },
+    {
+      "name": "i_cat_sales_share",
+      "zh": "所属类目特征期销售额占比(0~1)",
+      "group": "B 商品·统计·时间"
+    },
+    {
+      "name": "i_top_weekday_code",
+      "zh": "商品销量峰值星期(0=周一~6=周日)",
+      "group": "B 商品·统计·时间"
+    },
+    {
+      "name": "ui_cat_lift_log",
+      "zh": "用户对该类目的偏好提升比 log1p(用户类目份额/全局份额)",
+      "group": "C 用户×商品交互"
+    },
+    {
+      "name": "ui_price_gap_log",
+      "zh": "商品价位 − 用户自购均价（对数差，带符号）",
+      "group": "C 用户×商品交互"
+    },
+    {
+      "name": "ui_emb_sim",
+      "zh": "与用户历史购买向量的余弦（特征期重训向量）",
+      "group": "C 用户×商品交互"
+    },
+    {
+      "name": "ui_cf_sim",
+      "zh": "与用户已购集合的 ItemCF 聚合余弦（共同购买者画像）",
+      "group": "C 用户×商品交互"
+    },
+    {
+      "name": "ui_nn_hit_rate",
+      "zh": "商品向量近邻中被用户买过的占比(0~1)",
+      "group": "C 用户×商品交互"
+    },
+    {
+      "name": "country_uk",
+      "zh": "国家=英国 one-hot",
+      "group": "D 文本→数值编码"
+    },
+    {
+      "name": "country_de",
+      "zh": "国家=德国 one-hot",
+      "group": "D 文本→数值编码"
+    },
+    {
+      "name": "country_fr",
+      "zh": "国家=法国 one-hot",
+      "group": "D 文本→数值编码"
+    },
+    {
+      "name": "country_eire",
+      "zh": "国家=爱尔兰(EIRE) one-hot",
+      "group": "D 文本→数值编码"
+    },
+    {
+      "name": "country_other",
+      "zh": "国家=其它 one-hot",
+      "group": "D 文本→数值编码"
+    },
+    {
+      "name": "cat_code_ordinal",
+      "zh": "收拢后类目编码(按销售额降序 0=头部~9=长尾/其它)",
+      "group": "D 文本→数值编码"
+    }
+  ],
+  "cat_buckets": [
+    {
+      "code": 0,
+      "name": "家居装饰",
+      "revenue": 1586525.79,
+      "share": 0.2108
+    },
+    {
+      "code": 1,
+      "name": "厨房用品",
+      "revenue": 1483379.23,
+      "share": 0.1971
+    },
+    {
+      "code": 2,
+      "name": "生活用品",
+      "revenue": 890232.27,
+      "share": 0.1183
+    },
+    {
+      "code": 3,
+      "name": "装饰品",
+      "revenue": 761784.87,
+      "share": 0.1012
+    },
+    {
+      "code": 4,
+      "name": "其他",
+      "revenue": 743207.22,
+      "share": 0.0988
+    },
+    {
+      "code": 5,
+      "name": "派对用品",
+      "revenue": 674797.91,
+      "share": 0.0897
+    },
+    {
+      "code": 6,
+      "name": "购物袋",
+      "revenue": 603763.11,
+      "share": 0.0802
+    },
+    {
+      "code": 7,
+      "name": "收纳用品",
+      "revenue": 556722.7,
+      "share": 0.074
+    },
+    {
+      "code": 8,
+      "name": "手工用品",
+      "revenue": 205266.42,
+      "share": 0.0273
+    },
+    {
+      "code": 9,
+      "name": "园艺用品",
+      "revenue": 20372.77,
+      "share": 0.0027
+    }
+  ],
+  "country_cols": [
+    "country_uk",
+    "country_de",
+    "country_fr",
+    "country_eire",
+    "country_other"
+  ],
+  "wide_csv": "outputs/feature_stage/feature_wide.csv",
+  "id_map_csv": "outputs/feature_stage/id_map.csv",
+  "category_map_csv": "outputs/feature_stage/category_map.csv",
+  "n_cold_pos": 462,
+  "n_cold_pos_share": 0.0218,
+  "lgb": {
+    "params": {
+      "n_estimators": 300.0,
+      "learning_rate": 0.1,
+      "num_leaves": 31.0,
+      "min_child_samples": 20.0,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "random_state": 42.0,
+      "verbosity": -1.0,
+      "scale_pos_weight": 3.0
+    },
+    "valid_ratio": 0.3,
+    "n_fit_users": 723,
+    "n_valid_users": 310,
+    "auc": 0.8544,
+    "importance": [
+      {
+        "feature": "i_last_gap_log",
+        "zh": "商品滞销程度：最近销售距今间隔(log1p，值大=久未售)",
+        "gain": 127248.41186010838,
+        "weight": 373.0,
+        "pos_mean": 0.4487292786640006,
+        "neg_mean": 2.175322089605749,
+        "rank": 1
+      },
+      {
+        "feature": "i_pop_rank_frac",
+        "zh": "商品热门排名位置(0=最热→1=最冷)",
+        "gain": 32206.703651070595,
+        "weight": 407.0,
+        "pos_mean": 0.24986018286136755,
+        "neg_mean": 0.5193787952109385,
+        "rank": 2
+      },
+      {
+        "feature": "ui_emb_sim",
+        "zh": "与用户历史购买向量的余弦（特征期重训向量）",
+        "gain": 20408.20160961151,
+        "weight": 619.0,
+        "pos_mean": 0.2129628030747264,
+        "neg_mean": 0.169060943227725,
+        "rank": 3
+      },
+      {
+        "feature": "i_first_gap_log",
+        "zh": "商品上架时间：首销距今间隔(log1p，值大=老品)",
+        "gain": 16981.298658013344,
+        "weight": 490.0,
+        "pos_mean": 5.163980636572397,
+        "neg_mean": 5.535594403711152,
+        "rank": 4
+      },
+      {
+        "feature": "i_qty_log",
+        "zh": "商品特征期总销量(log1p)",
+        "gain": 11284.807158827782,
+        "weight": 516.0,
+        "pos_mean": 6.911141952945299,
+        "neg_mean": 5.363634306809685,
+        "rank": 5
+      },
+      {
+        "feature": "ui_nn_hit_rate",
+        "zh": "商品向量近邻中被用户买过的占比(0~1)",
+        "gain": 10946.517296433449,
+        "weight": 158.0,
+        "pos_mean": 0.055803676922349825,
+        "neg_mean": 0.02021362068150669,
+        "rank": 6
+      },
+      {
+        "feature": "i_pop_orders_log",
+        "zh": "商品特征期被购订单数(log1p)",
+        "gain": 8950.479845643044,
+        "weight": 425.0,
+        "pos_mean": 4.654542388871518,
+        "neg_mean": 3.4659986138208176,
+        "rank": 7
+      },
+      {
+        "feature": "ui_cat_lift_log",
+        "zh": "用户对该类目的偏好提升比 log1p(用户类目份额/全局份额)",
+        "gain": 8468.969064593315,
+        "weight": 538.0,
+        "pos_mean": 0.7249331124092397,
+        "neg_mean": 0.6469672451757229,
+        "rank": 8
+      },
+      {
+        "feature": "i_price_log",
+        "zh": "商品特征期单价中位数(log1p)",
+        "gain": 8023.9062695503235,
+        "weight": 445.0,
+        "pos_mean": 1.0792022518666484,
+        "neg_mean": 1.1869790499412165,
+        "rank": 9
+      },
+      {
+        "feature": "ui_price_gap_log",
+        "zh": "商品价位 − 用户自购均价（对数差，带符号）",
+        "gain": 7915.308814167976,
+        "weight": 531.0,
+        "pos_mean": 0.0841385826260217,
+        "neg_mean": 0.16994489673151006,
+        "rank": 10
+      },
+      {
+        "feature": "i_pop_buyers_log",
+        "zh": "商品热度：特征期购买用户数(log1p)",
+        "gain": 7667.828104972839,
+        "weight": 375.0,
+        "pos_mean": 4.431939507676741,
+        "neg_mean": 3.290889042414503,
+        "rank": 11
+      },
+      {
+        "feature": "u_avg_unit_price_log",
+        "zh": "用户历史自购商品均价(log1p)",
+        "gain": 7535.744979977608,
+        "weight": 463.0,
+        "pos_mean": 1.0170341532097067,
+        "neg_mean": 1.0170341532097067,
+        "rank": 12
+      },
+      {
+        "feature": "ui_cf_sim",
+        "zh": "与用户已购集合的 ItemCF 聚合余弦（共同购买者画像）",
+        "gain": 6760.6179629564285,
+        "weight": 473.0,
+        "pos_mean": 13.072291039939074,
+        "neg_mean": 8.610070707843896,
+        "rank": 13
+      },
+      {
+        "feature": "u_avg_basket_size_log",
+        "zh": "用户平均每单商品种数(log1p)",
+        "gain": 6377.082079768181,
+        "weight": 440.0,
+        "pos_mean": 3.3195013617823768,
+        "neg_mean": 3.3195013617823768,
+        "rank": 14
+      },
+      {
+        "feature": "u_last_active_gap_log",
+        "zh": "距切窗最近一次购买间隔天数(log1p，0=非常近)",
+        "gain": 6246.109439730644,
+        "weight": 397.0,
+        "pos_mean": 3.1215252072275708,
+        "neg_mean": 3.1215252072275708,
+        "rank": 15
+      },
+      {
+        "feature": "u_cat_entropy",
+        "zh": "用户购买类目集中度熵(归一化)",
+        "gain": 5832.295734643936,
+        "weight": 434.0,
+        "pos_mean": 0.8918922867157341,
+        "neg_mean": 0.8918922867157338,
+        "rank": 16
+      },
+      {
+        "feature": "u_spend_log",
+        "zh": "用户历史总消费金额(log1p)",
+        "gain": 5355.949118852615,
+        "weight": 359.0,
+        "pos_mean": 7.4978943012194526,
+        "neg_mean": 7.4978943012194526,
+        "rank": 17
+      },
+      {
+        "feature": "u_qty_log",
+        "zh": "用户历史总购买件数(log1p)",
+        "gain": 5010.41286110878,
+        "weight": 326.0,
+        "pos_mean": 6.954200505189421,
+        "neg_mean": 6.954200505189421,
+        "rank": 18
+      },
+      {
+        "feature": "i_cat_sales_log",
+        "zh": "所属类目特征期销售额(log1p)",
+        "gain": 4928.763800859451,
+        "weight": 261.0,
+        "pos_mean": 13.643728048965599,
+        "neg_mean": 13.733531883009226,
+        "rank": 19
+      },
+      {
+        "feature": "u_n_items_log",
+        "zh": "用户历史去重购买商品数(log1p)",
+        "gain": 4810.622300863266,
+        "weight": 317.0,
+        "pos_mean": 4.702957292644506,
+        "neg_mean": 4.702957292644506,
+        "rank": 20
+      },
+      {
+        "feature": "u_weekend_ratio",
+        "zh": "用户周末下单占比(0~1)",
+        "gain": 2005.2119154930115,
+        "weight": 164.0,
+        "pos_mean": 0.1552184822800983,
+        "neg_mean": 0.15521848228009832,
+        "rank": 21
+      },
+      {
+        "feature": "i_top_weekday_code",
+        "zh": "商品销量峰值星期(0=周一~6=周日)",
+        "gain": 1948.1167973279953,
+        "weight": 141.0,
+        "pos_mean": 2.2621106857601965,
+        "neg_mean": 2.3295366825779418,
+        "rank": 22
+      },
+      {
+        "feature": "u_n_orders_log",
+        "zh": "用户历史订单数(log1p)",
+        "gain": 1616.3577983379364,
+        "weight": 113.0,
+        "pos_mean": 1.925292710292719,
+        "neg_mean": 1.925292710292719,
+        "rank": 23
+      },
+      {
+        "feature": "u_active_days_log",
+        "zh": "用户历史活跃购买天数(log1p)",
+        "gain": 1372.7108466625214,
+        "weight": 104.0,
+        "pos_mean": 1.8445366443720288,
+        "neg_mean": 1.8445366443720284,
+        "rank": 24
+      },
+      {
+        "feature": "i_cat_sales_share",
+        "zh": "所属类目特征期销售额占比(0~1)",
+        "gain": 683.4372780323029,
+        "weight": 50.0,
+        "pos_mean": 0.1261401983612259,
+        "neg_mean": 0.13634475559560483,
+        "rank": 25
+      },
+      {
+        "feature": "cat_code_ordinal",
+        "zh": "收拢后类目编码(按销售额降序 0=头部~9=长尾/其它)",
+        "gain": 493.5397071838379,
+        "weight": 31.0,
+        "pos_mean": 3.0467886005954914,
+        "neg_mean": 2.62465144855617,
+        "rank": 26
+      },
+      {
+        "feature": "country_uk",
+        "zh": "国家=英国 one-hot",
+        "gain": 258.7835097312927,
+        "weight": 16.0,
+        "pos_mean": 0.9183798856278652,
+        "neg_mean": 0.9183798856278652,
+        "rank": 27
+      },
+      {
+        "feature": "country_fr",
+        "zh": "国家=法国 one-hot",
+        "gain": 255.38686275482178,
+        "weight": 21.0,
+        "pos_mean": 0.02495392031759535,
+        "neg_mean": 0.02495392031759535,
+        "rank": 28
+      },
+      {
+        "feature": "country_de",
+        "zh": "国家=德国 one-hot",
+        "gain": 85.82485103607178,
+        "weight": 8.0,
+        "pos_mean": 0.023536083935913797,
+        "neg_mean": 0.023536083935913797,
+        "rank": 29
+      },
+      {
+        "feature": "country_other",
+        "zh": "国家=其它 one-hot",
+        "gain": 42.02317953109741,
+        "weight": 5.0,
+        "pos_mean": 0.02396143485041826,
+        "neg_mean": 0.02396143485041826,
+        "rank": 30
+      },
+      {
+        "feature": "country_eire",
+        "zh": "国家=爱尔兰(EIRE) one-hot",
+        "gain": 0.0,
+        "weight": 0.0,
+        "pos_mean": 0.009168675268207383,
+        "neg_mean": 0.009168675268207383,
+        "rank": 31
+      }
+    ]
+  }
+}

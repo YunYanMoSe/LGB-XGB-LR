@@ -1,0 +1,45 @@
+{
+  "ranker": "lr",
+  "recommendations": [
+    {
+      "buyers": 152,
+      "category": "手工用品",
+      "code": "23569",
+      "desc": "TRADTIONAL ALPHABET STAMP SET",
+      "desc_zh": "传统字母印章套装",
+      "price": 4.95,
+      "proba": 0.8474,
+      "rank": 1,
+      "routes": "相似扩展"
+    },
+    {
+      "buyers": 678,
+      "category": "装饰品",
+      "code": "84879",
+      "desc": "ASSORTED COLOUR BIRD ORNAMENT",
+      "desc_zh": "彩色小鸟装饰品",
+      "price": 1.69,
+      "proba": 0.8406,
+      "rank": 2,
+      "routes": "热门"
+    },
+    {
+      "buyers": 613,
+      "category": "派对用品",
+      "code": "22086",
+      "desc": "PAPER CHAIN KIT 50'S CHRISTMAS",
+      "desc_zh": "纸链套装50年代圣诞",
+      "price": 2.95,
+      "proba": 0.8239,
+      "rank": 3,
+      "routes": "热门"
+    }
+  ],
+  "topn": 3,
+  "user": {
+    "last_basket_zh": "兔子夜灯、小号玻璃钟罩、粉色悬挂心形茶烛台、波点彩旗、经典金属鸟笼植物架",
+    "n_invoices": 4,
+    "n_items": 184
+  },
+  "user_id": 12597
+}

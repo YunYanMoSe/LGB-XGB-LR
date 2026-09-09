@@ -1,0 +1,92 @@
+[
+  {
+    "case": "T1_health",
+    "method": "GET",
+    "url": "http://127.0.0.1:5099/health",
+    "status": 200,
+    "content_type": "application/json",
+    "rendered": true,
+    "screenshot_kb": 38.4
+  },
+  {
+    "case": "T2_similar_i2v",
+    "method": "GET",
+    "url": "http://127.0.0.1:5099/similar?item_id=85123A&topn=3&method=item2vec&format=json",
+    "status": 200,
+    "content_type": "application/json",
+    "rendered": true,
+    "screenshot_kb": 76.5
+  },
+  {
+    "case": "T3_similar_itemcf",
+    "method": "GET",
+    "url": "http://127.0.0.1:5099/similar?item_id=85123A&topn=3&method=itemcf&format=json",
+    "status": 200,
+    "content_type": "application/json",
+    "rendered": true,
+    "screenshot_kb": 76.5
+  },
+  {
+    "case": "T4_recommend_lr",
+    "method": "GET",
+    "url": "http://127.0.0.1:5099/recommend?user_id=12597&topn=3&ranker=lr&format=json",
+    "status": 200,
+    "content_type": "application/json",
+    "rendered": true,
+    "screenshot_kb": 78.0
+  },
+  {
+    "case": "T5_recommend_lgb",
+    "method": "GET",
+    "url": "http://127.0.0.1:5099/recommend?user_id=12597&topn=3&ranker=lgb&format=json",
+    "status": 200,
+    "content_type": "application/json",
+    "rendered": true,
+    "screenshot_kb": 78.4
+  },
+  {
+    "case": "T6_baseline",
+    "method": "GET",
+    "url": "http://127.0.0.1:5099/baseline?user_id=13899&topn=3&format=json",
+    "status": 200,
+    "content_type": "application/json",
+    "rendered": true,
+    "screenshot_kb": 98.1
+  },
+  {
+    "case": "E1_similar_no_item",
+    "method": "GET",
+    "url": "http://127.0.0.1:5099/similar?format=json",
+    "status": 0,
+    "content_type": "",
+    "rendered": true,
+    "screenshot_kb": 40.9
+  },
+  {
+    "case": "E2_similar_cold",
+    "method": "GET",
+    "url": "http://127.0.0.1:5099/similar?item_id=ZZZZ9&method=item2vec&format=json",
+    "status": 0,
+    "content_type": "",
+    "rendered": true,
+    "screenshot_kb": 43.9
+  },
+  {
+    "case": "E3_recommend_nouser",
+    "method": "GET",
+    "url": "http://127.0.0.1:5099/recommend?user_id=99999999&ranker=lr&format=json",
+    "status": 0,
+    "content_type": "",
+    "rendered": true,
+    "screenshot_kb": 43.6
+  },
+  {
+    "case": "E4_recommend_ranker",
+    "method": "GET",
+    "url": "http://127.0.0.1:5099/recommend?user_id=12597&ranker=svm&format=json",
+    "status": 0,
+    "content_type": "",
+    "rendered": true,
+    "screenshot_kb": 43.2
+  }
+]

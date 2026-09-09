@@ -1,0 +1,12 @@
+{
+  "name": "cand-lgb-v3",
+  "desc": "c1+macro_user_wt：1000树 lr0.05 leaves63 mcs30，全量用户，按1/sqrt(用户行数)加权（对齐逐用户macro口径），打分切窗2010-11-01",
+  "over": {
+    "n_estimators": 1000,
+    "learning_rate": 0.05,
+    "num_leaves": 63,
+    "min_child_samples": 30
+  },
+  "weight": "macro",
+  "ensemble_lr": false
+}

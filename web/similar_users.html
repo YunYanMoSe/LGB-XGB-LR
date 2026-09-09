@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>相似用户推荐 · 基于用户的协同过滤</title>
+<link rel="stylesheet" href="assets/app.css">
+<script>
+/* 主题：默认跟随系统，手动切换后记住（file:// 下 localStorage 可能不可用，需容错） */
+(function () {
+  var el = document.documentElement;
+  try { var s = localStorage.getItem("rec-theme"); if (s) el.dataset.theme = s; } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <span class="brand"><span class="dot"></span>推荐系统 · 阶段四</span>
+    <span class="spacer"></span>
+    <nav>
+      <a href="index.html">总览</a>
+      <a class="on" href="similar_users.html">相似用户</a>
+      <a href="similar_items.html">相似商品</a>
+    </nav>
+    <button class="theme-toggle" id="themeBtn" title="切换明暗主题" aria-label="切换明暗主题">🌙</button>
+  </header>
+
+  <section class="hero">
+    <h1>输入用户 ID → 得到 Ta 的相似用户</h1>
+    <div class="sub" id="subLine">…</div>
+    <span class="pill" id="methodPill">…</span>
+  </section>
+
+  <section class="search-card">
+    <div class="search-row">
+      <label for="uidInput">用户 ID</label>
+      <input class="q" id="uidInput" type="text" inputmode="numeric" autocomplete="off"
+             placeholder="例如 17850" spellcheck="false">
+      <button class="go" id="goBtn" type="button">查看相似用户</button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <div class="msg" id="msg"></div>
+
+  <section id="result" class="hidden">
+    <div class="kpis" id="kpis"></div>
+    <div class="panel-head">
+      <h2 id="panelTitle">…</h2>
+      <span class="count" id="panelCount"></span>
+    </div>
+    <div class="rows" id="rows"></div>
+  </section>
+
+  <section class="note analysis">
+    <h2><span class="ic"></span>总结与分析：这个结果该怎么看</h2>
+    <div class="verdict" id="aVerdict"></div>
+    <ul class="find" id="aFind"></ul>
+    <div class="chartbox">
+      <p class="ct">为什么有些分数看着高、有些很低？——按「目标用户自己买过几种商品」分组</p>
+      <p class="cs">柱高 = 每组用户「最相似的那个人」的相似度中位数；括号内为该组人数。</p>
+      <div class="bars" id="aBars"></div>
+      <div class="scale-note">柱高刻度 0–1，虚线 = 0.5</div>
+    </div>
+    <p class="takeaway2" id="aTake"></p>
+  </section>
+
+  <details class="note">
+    <summary>口径与技术细节（选读）</summary>
+    <p><b>口径：</b>把每个用户的历史购买向量（每件商品的分量 = 累计购买数量）放进
+      「用户 × 商品」稀疏矩阵，任意两个用户的相似度 = 两个行向量的<b>余弦值</b>；
+      下方按相似度从高到低列出与目标用户最接近的 <span id="topKtxt">10</span> 位用户。</p>
+    <p><b>相似度条是按 0–1 真实刻度画的</b>（满格 = 1.0），所以多数条形都比较短——这正是
+      信号：本数据集中任意两个用户的购买向量重叠很少。</p>
+    <ul>
+      <li>相似度 0 = 无任何共同购买商品；越接近 1 = 买的东西与数量越接近。</li>
+      <li>点击列表中的任意用户，可以继续查询「Ta 的相似用户」，形成链式探索。</li>
+      <li>对相似度 > 0 的用户都列出；少于 Top-K 说明目标与其余用户几乎无重叠。</li>
+    </ul>
+    <p><b>数据与已知特点：</b><span id="dataNote"></span></p>
+  </details>
+
+  <footer>清洗后交易 397,884 行 · 数据文件由 scripts/04_build_similar_web.py 离线生成，本页可离线打开</footer>
+</div>
+
+<script src="data/user_sim.js"></script>
+<script>
+(function () {
+  "use strict";
+  var D = window.USER_SIM;
+  var M = D.meta;
+
+  /* ---------- 顶栏/说明注入 ---------- */
+  var nU = M.nUsers.toLocaleString("en-US"), nI = M.nItems.toLocaleString("en-US"),
+      nz = M.nnz.toLocaleString("en-US");
+  document.getElementById("subLine").textContent =
+    "从清洗后的交易中为每一位用户离线算好 Top-" + M.topK + " 位相似用户，双击本页即可查询。";
+  document.getElementById("methodPill").textContent = M.method;
+  document.getElementById("topKtxt").textContent = M.topK;
+  document.getElementById("dataNote").textContent =
+    "共 " + nU + " 位用户 × " + nI + " 种商品，非零 " + nz + "，矩阵稀疏度 " +
+    M.density + "%；该数据集为批发形态，用户中位购买 35 种商品、订单内一次采购多个品类，" +
+    "因此用户相似主要由「少数共买商品」支撑（Top1 相似用户的中位共同商品仅约 3 种）。";
+
+  /* ---------- 主题切换 ---------- */
+  var themeBtn = document.getElementById("themeBtn");
+  function resolvedDark() {
+    var t = document.documentElement.dataset.theme;
+    if (t === "dark") return true;
+    if (t === "light") return false;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function paint() {
+    themeBtn.textContent = resolvedDark() ? "☀️" : "🌙";
+  }
+  themeBtn.addEventListener("click", function () {
+    var el = document.documentElement;
+    el.dataset.theme = resolvedDark() ? "light" : "dark";
+    try { localStorage.setItem("rec-theme", el.dataset.theme); } catch (e) {}
+    paint();
+  });
+  paint();
+
+  /* ---------- 查询 ---------- */
+  var input = document.getElementById("uidInput");
+  var msg = document.getElementById("msg");
+  var resultSec = document.getElementById("result");
+  var kpis = document.getElementById("kpis");
+  var rowsEl = document.getElementById("rows");
+  var panelTitle = document.getElementById("panelTitle");
+  var panelCount = document.getElementById("panelCount");
+
+  function showMsg(text, isErr) {
+    msg.textContent = text;
+    msg.classList.toggle("err", !!isErr);
+    msg.classList.add("show");
+  }
+  function hideMsg() { msg.classList.remove("show"); }
+
+  function tile(k, v, extra) {
+    return '<div class="tile"><div class="k">' + k + '</div>' +
+      '<div class="v">' + v + '</div>' +
+      (extra ? '<div class="desc">' + extra + '</div>' : "") + "</div>";
+  }
+
+  function query(raw) {
+    var idStr = String(raw).trim();
+    if (!/^\d+$/.test(idStr)) { showMsg("请输入纯数字的用户 ID。", true); return; }
+    var id = parseInt(idStr, 10);
+    var st = D.stat[idStr];
+    var rec = D.rec[idStr] || [];
+    if (!st) { showMsg("数据中不存在用户 ID = " + id + "（用户号范围见 " +
+      M.nUsers.toLocaleString("en-US") + " 位清洗后用户）。", true); resultSec.classList.add("hidden"); return; }
+    hideMsg();
+
+    /* KPI */
+    var top1 = rec.length ? rec[0][1] : 0;
+    kpis.innerHTML =
+      tile("目标用户", id) +
+      tile("历史订单数", st[0]) +
+      tile("购买商品种类", st[1]) +
+      tile("相似用户数 (>0)", rec.length ? rec.length : 0) +
+      tile("Top1 相似度", rec.length ? top1.toFixed(4) : "—");
+
+    panelTitle.textContent = "用户 " + id + " 的相似用户";
+    panelCount.textContent = "按「购买数量 · 余弦相似度」降序 · 相似度 > 0";
+    resultSec.classList.remove("hidden");
+
+    if (!rec.length) {
+      rowsEl.innerHTML = "";
+      showMsg("未找到相似用户：该用户的购买商品与其他用户无重叠。", true);
+      return;
+    }
+
+    var html = "";
+    rec.forEach(function (r, i) {
+      var nbId = r[0], sc = r[1];
+      var nst = D.stat[String(nbId)];
+      var nm = nst ? ("订单 " + nst[0] + " · 共 " + nst[1] + " 种商品") : "—";
+      html +=
+        '<div class="row">' +
+          '<div class="rank">#' + (i + 1) + "</div>" +
+          '<div class="who"><div class="id">用户 ' + nbId + "</div>" +
+            '<div class="meta">' + nm + "</div></div>" +
+          '<div class="sim-track"><div class="sim-fill" style="width:' +
+            Math.max(1.5, sc * 100).toFixed(2) + '%"></div></div>' +
+          '<div class="score">' + sc.toFixed(4) + '<span class="u">相似度</span></div>' +
+          '<button class="drill" data-id="' + nbId + '" type="button">查 Ta 的相似用户</button>' +
+        "</div>";
+    });
+    rowsEl.innerHTML = html;
+  }
+
+  function go() { query(input.value); }
+  document.getElementById("goBtn").addEventListener("click", go);
+  input.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+  rowsEl.addEventListener("click", function (e) {
+    var b = e.target.closest("button.drill");
+    if (!b) return;
+    input.value = b.getAttribute("data-id");
+    go();
+    input.focus();
+  });
+
+  /* ---------- 总结与分析 ---------- */
+  function renderAnalysis() {
+    var A = D.meta.analysis;
+    if (!A || !A.buckets) return;
+    var b = A.buckets;
+    document.getElementById("aVerdict").innerHTML =
+      "<b>一句话：</b>「相似用户」不是“品位相同的人”，而是“购物篮和你重叠到能用来推荐的用户”。" +
+      "哪怕是最像的一对，共同买过的商品通常也只有 <b>" + A.overlapMed + " 件</b>（全库中位），" +
+      "所以分数普遍只有 0.3–0.6 很正常；分数接近 1 反而要警惕——那多半是只买过一两件、恰好撞了同一个爆款。";
+    document.getElementById("aFind").innerHTML =
+      "<li><b>Top1 相似度中位 ≈ " + A.medTop1.toFixed(2) + "</b>：大多数人“最像的人”也只有 0.5 上下，别期待接近 1。</li>" +
+      "<li><b>共同购买商品中位仅 " + A.overlapMed + " 种</b>（均值 " + A.overlapMean.toFixed(1) + " 种）：" +
+      "相似主要由零星几件商品支撑，且多半是爆款。</li>" +
+      "<li><b>人均购买 " + A.degMed + " 种商品、全库稀疏度 " + M.density + "%</b>：购物篮大而与他人重叠少，是分数普遍偏低的根源。</li>";
+    document.getElementById("aBars").innerHTML = b.map(function (x) {
+      var h = Math.max(2, Math.round(x[2] * 100));
+      return '<div class="col"><div class="val">' + x[2].toFixed(2) + '</div>' +
+        '<div class="fill" style="height:' + h + '%"></div>' +
+        '<div class="lab">' + x[0] + '<small>' + x[1] + " 人</small></div></div>";
+    }).join("");
+    document.getElementById("aTake").innerHTML =
+      "<b>看懂它：</b>最左边的柱（只买过 1–2 种商品的用户）最高，中位约 " +
+      b[0][2].toFixed(2) + "——看着最“像”，其实最不可信（那点重合多半来自同一个爆款）；" +
+      "用户自己买得越广，分数越落回并稳定在约 " + b[3][2].toFixed(2) +
+      "。所以对买得很少的新用户，别迷信高相似分；真要“推荐买什么”，同数据下用 ItemCF 更稳（见 README 阶段四的离线评测）。";
+  }
+  renderAnalysis();
+
+  /* 试试按钮 */
+  var chips = document.getElementById("chips");
+  M.samples.forEach(function (s) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.innerHTML = "用户 " + s[0] + " <small>· " + s[1] + "</small>";
+    b.addEventListener("click", function () { input.value = s[0]; go(); });
+    chips.appendChild(b);
+  });
+
+  input.focus();
+})();
+</script>
+</body>
+</html>

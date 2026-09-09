@@ -1,0 +1,38 @@
+# 池化AUC vs gAUC_m 探针（OOF 187,730 行 Jul..Oct）
+
+===== v6 分量(oof_eqg)  comps=['lgb_macro_eq', 'xgb_macro_eq', 'lr_eq_l2_sp'] =====
+  单 lgb_macro_eq    : 池化AUC=0.8678  gAUC_m=0.8535
+  单 xgb_macro_eq    : 池化AUC=0.8852  gAUC_m=0.8665
+  单 lr_eq_l2_sp     : 池化AUC=0.8808  gAUC_m=0.8687
+  按 池化AUC argmax top5:
+    w=(0.075, 0.55, 0.375)  pooledAUC=0.8883  gAUC_m=0.8714
+    w=(0.05, 0.575, 0.375)  pooledAUC=0.8883  gAUC_m=0.8715
+    w=(0.075, 0.575, 0.35)  pooledAUC=0.8883  gAUC_m=0.8713
+    w=(0.075, 0.525, 0.4)  pooledAUC=0.8883  gAUC_m=0.8714
+    w=(0.05, 0.55, 0.4)  pooledAUC=0.8883  gAUC_m=0.8714
+  按 gAUC_m argmax top5:
+    w=(0.1, 0.3, 0.6)  pooledAUC=0.8872  gAUC_m=0.8721
+    w=(0.15, 0.275, 0.575)  pooledAUC=0.8872  gAUC_m=0.8720
+    w=(0.175, 0.275, 0.55)  pooledAUC=0.8872  gAUC_m=0.8720
+    w=(0.2, 0.225, 0.575)  pooledAUC=0.8868  gAUC_m=0.8720
+    w=(0.2, 0.275, 0.525)  pooledAUC=0.8872  gAUC_m=0.8720
+  → 池化AUC-argmax 冠军 w=(0.075, 0.55, 0.375) pooledAUC=0.8883 (gAUC_m=0.8714)
+
+===== 重调分量(oof_eqtune)  comps=['lgb_lb_base', 'xgb_xb_d5', 'lr_w2_a1p0_C3p0'] =====
+  单 lgb_lb_base     : 池化AUC=0.8678  gAUC_m=0.8535
+  单 xgb_xb_d5       : 池化AUC=0.8852  gAUC_m=0.8671
+  单 lr_w2_a1p0_C3p0 : 池化AUC=0.8807  gAUC_m=0.8692
+  按 池化AUC argmax top5:
+    w=(0.05, 0.575, 0.375)  pooledAUC=0.8882  gAUC_m=0.8714
+    w=(0.075, 0.55, 0.375)  pooledAUC=0.8882  gAUC_m=0.8714
+    w=(0.05, 0.6, 0.35)  pooledAUC=0.8882  gAUC_m=0.8713
+    w=(0.05, 0.55, 0.4)  pooledAUC=0.8882  gAUC_m=0.8715
+    w=(0.075, 0.575, 0.35)  pooledAUC=0.8881  gAUC_m=0.8713
+  按 gAUC_m argmax top5:
+    w=(0.0, 0.4, 0.6)  pooledAUC=0.8871  gAUC_m=0.8722
+    w=(0.025, 0.375, 0.6)  pooledAUC=0.8872  gAUC_m=0.8722
+    w=(0.0, 0.375, 0.625)  pooledAUC=0.8869  gAUC_m=0.8721
+    w=(0.025, 0.35, 0.625)  pooledAUC=0.8870  gAUC_m=0.8721
+    w=(0.05, 0.35, 0.6)  pooledAUC=0.8872  gAUC_m=0.8721
+  → 池化AUC-argmax 冠军 w=(0.05, 0.575, 0.375) pooledAUC=0.8882 (gAUC_m=0.8714)
+

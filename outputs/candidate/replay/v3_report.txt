@@ -1,0 +1,14 @@
+# v3 新特征筛查（44 vs 49 特征，同折同配方；基准 v6 fusion gAUC_m .8721 / comp_m .58429）
+
+[44(v6基线)] lgb_macro_eq     gAUC_m=0.8535 comp_m=0.56619
+[44(v6基线)] xgb_macro_eq     gAUC_m=0.8665 comp_m=0.58043
+[44(v6基线)] lr_eq_l2_sp      gAUC_m=0.8687 comp_m=0.57974
+[44(v6基线)] fusion(.1,.3,.6) gAUC_m=0.8721 comp_m=0.58429
+
+[49(+5v3)] lgb_macro_eq     gAUC_m=0.8520 comp_m=0.56553
+[49(+5v3)] xgb_macro_eq     gAUC_m=0.8663 comp_m=0.57911
+[49(+5v3)] lr_eq_l2_sp      gAUC_m=0.8686 comp_m=0.58098
+[49(+5v3)] fusion(.1,.3,.6) gAUC_m=0.8711 comp_m=0.58390
+
+== 49 vs 44：融合 gAUC_m -0.0010（基线 .8721）、comp_m -0.00039（基线 .58429）==
+== 判据：两口径均空 → 该批特征证伪，收在 v6 ==

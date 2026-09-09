@@ -1,0 +1,22 @@
+# v5 融合选权（wide_v2：lgb_macro / lgb_macro_sp / xgb_macro / lr_last2）
+
+单 lgb_macro   : AUC=0.8676 gAUC_w=0.8428 gAUC_m=0.8556
+单 lgb_macro_sp: AUC=0.8542 gAUC_w=0.8286 gAUC_m=0.8415
+单 xgb_macro   : AUC=0.8786 gAUC_w=0.8459 gAUC_m=0.8586
+单 lr          : AUC=0.8810 gAUC_w=0.8539 gAUC_m=0.8684
+
+== 三分量树×2（['lgb_macro', 'xgb_macro', 'lr']）按 gAUC_m top5 ==
+w=(0.15, 0.15, 0.7)  AUC=0.8854 gAUC_w=0.8571 gAUC_m=0.8710
+w=(0.15, 0.1, 0.75)  AUC=0.8849 gAUC_w=0.8569 gAUC_m=0.8709
+w=(0.1, 0.15, 0.75)  AUC=0.8852 gAUC_w=0.8569 gAUC_m=0.8708
+w=(0.1, 0.25, 0.65)  AUC=0.8860 gAUC_w=0.8572 gAUC_m=0.8708
+w=(0.2, 0.1, 0.7)  AUC=0.8850 gAUC_w=0.8569 gAUC_m=0.8707
+
+== 两分量基准(对照 v4=.8703)（['lgb_macro', 'lr']）按 gAUC_m top5 ==
+w=(0.2, 0.8)  AUC=0.8839 gAUC_w=0.8562 gAUC_m=0.8703
+w=(0.15, 0.85)  AUC=0.8835 gAUC_w=0.8560 gAUC_m=0.8702
+w=(0.3, 0.7)  AUC=0.8840 gAUC_w=0.8563 gAUC_m=0.8702
+w=(0.25, 0.75)  AUC=0.8840 gAUC_w=0.8562 gAUC_m=0.8702
+w=(0.35, 0.65)  AUC=0.8838 gAUC_w=0.8563 gAUC_m=0.8701
+
+== 最佳 w={'lgb_macro': 0.15, 'xgb_macro': 0.15, 'lr': 0.7}（若 gAUC_m > .8703 → 产 v5 提交）==

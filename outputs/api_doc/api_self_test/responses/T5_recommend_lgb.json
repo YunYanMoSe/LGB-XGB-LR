@@ -1,0 +1,45 @@
+{
+  "ranker": "lgb",
+  "recommendations": [
+    {
+      "buyers": 485,
+      "category": "家居装饰",
+      "code": "22470",
+      "desc": "HEART OF WICKER LARGE",
+      "desc_zh": "大号柳编心形装饰",
+      "price": 2.95,
+      "proba": 0.5259,
+      "rank": 1,
+      "routes": "热门"
+    },
+    {
+      "buyers": 471,
+      "category": "厨房用品",
+      "code": "22666",
+      "desc": "RECIPE BOX PANTRY YELLOW DESIGN",
+      "desc_zh": "黄色食品储藏室设计食谱盒",
+      "price": 2.95,
+      "proba": 0.4931,
+      "rank": 2,
+      "routes": "热门"
+    },
+    {
+      "buyers": 472,
+      "category": "厨房用品",
+      "code": "23245",
+      "desc": "SET OF 3 REGENCY CAKE TINS",
+      "desc_zh": "3个摄政时期蛋糕罐套装",
+      "price": 4.95,
+      "proba": 0.4673,
+      "rank": 3,
+      "routes": "热门"
+    }
+  ],
+  "topn": 3,
+  "user": {
+    "last_basket_zh": "兔子夜灯、小号玻璃钟罩、粉色悬挂心形茶烛台、波点彩旗、经典金属鸟笼植物架",
+    "n_invoices": 4,
+    "n_items": 184
+  },
+  "user_id": 12597
+}

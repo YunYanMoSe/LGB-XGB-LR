@@ -1,0 +1,8 @@
+raw=332,848  leader_clean=327,827  (报告 332,848→327,827; 差 5,021)
+2010-06-01  samples=38,005  pos=1,562  rate=4.1100%  new_combo=432
+2010-07-01  samples=41,200  pos=1,625  rate=3.9442%  new_combo=426
+2010-08-01  samples=45,399  pos=1,627  rate=3.5838%  new_combo=454
+2010-09-01  samples=48,097  pos=2,313  rate=4.8090%  new_combo=779
+2010-10-01  samples=53,034  pos=2,728  rate=5.1439%  new_combo=1,044
+TOTAL  samples=225,735  pos=9,855  rate=4.3657%  new=3,135
+users_known_ever=3,941 items_known_ever=3,950 cand_users=736 cand_items=2,690

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>相似推荐 · 阶段四总览</title>
+<link rel="stylesheet" href="assets/app.css">
+<script>
+(function () {
+  var el = document.documentElement;
+  try { var s = localStorage.getItem("rec-theme"); if (s) el.dataset.theme = s; } catch (e) {}
+})();
+</script>
+<style>
+.cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 18px; }
+.link-card {
+  display: block; text-decoration: none; color: var(--ink);
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 16px; padding: 22px 22px 18px; box-shadow: var(--shadow);
+  transition: transform .08s ease, border-color .08s ease;
+}
+.link-card:hover { transform: translateY(-2px); border-color: var(--series-1); }
+.link-card h2 { margin: 0 0 6px; font-size: 19px; }
+.link-card h2 .go { color: var(--series-1); font-weight: 700; margin-left: 6px; }
+.link-card p { margin: 0; color: var(--ink-2); font-size: 14px; }
+.link-card .tag { display:inline-block; margin-top: 12px; font-size: 12px; color: var(--series-1);
+  background: var(--series-1-100); border-radius: 999px; padding: 3px 10px; }
+.howto { margin-top: 22px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <span class="brand"><span class="dot"></span>推荐系统 · 阶段四</span>
+    <span class="spacer"></span>
+    <nav>
+      <a class="on" href="index.html">总览</a>
+      <a href="similar_users.html">相似用户</a>
+      <a href="similar_items.html">相似商品</a>
+    </nav>
+    <button class="theme-toggle" id="themeBtn" title="切换明暗主题" aria-label="切换明暗主题">🌙</button>
+  </header>
+
+  <section class="hero">
+    <h1>阶段四 · 相似用户 & 相似商品</h1>
+    <div class="sub">两套「输入即查」的静态推荐页面：离线预先算好全部相似关系，
+      数据随页面本地加载，双击 HTML 即可打开，无需服务器与联网。</div>
+    <span class="pill">基于用户的 CF（余弦）&nbsp;·&nbsp; 基于物品的 CF（余弦）</span>
+  </section>
+
+  <section class="cards">
+    <a class="link-card" href="similar_users.html">
+      <h2>相似用户<span class="go">→</span></h2>
+      <p>输入用户 ID，返回与该用户购买行为最接近的 Top-10 用户与余弦相似度；
+        可链式点查“Ta 的相似用户”。</p>
+      <span class="tag">User-based CF · 用户 × 商品</span>
+    </a>
+    <a class="link-card" href="similar_items.html">
+      <h2>相似商品<span class="go">→</span></h2>
+      <p>输入商品编号（可下拉选），返回被同一批用户以相近数量购买的 Top-10 商品，
+        展示“同款配色/系列”与“同主题搭配”。</p>
+      <span class="tag">Item-based CF · 同矩阵转置</span>
+    </a>
+  </section>
+
+  <section class="note howto">
+    <h3>使用说明</h3>
+    <ul>
+      <li>数据文件在 <code>web/data/*.js</code>，由
+        <code>scripts/04_build_similar_web.py</code> 一键再生成。</li>
+      <li>若双击后空白：请确认 <code>similar_users.html</code> 与
+        <code>data/</code>、<code>assets/</code> 保持相对路径（不要把 HTML 单独拷走）。</li>
+      <li>清洗数据 397,884 行 / 4,338 用户 / 3,665 商品；两种相似度都按“购买数量 · 余弦”定义。</li>
+    </ul>
+  </section>
+
+  <footer>离线静态页 · 明暗主题可切换 · 生成于阶段四</footer>
+</div>
+<script>
+(function () {
+  var btn = document.getElementById("themeBtn");
+  function dark() {
+    var t = document.documentElement.dataset.theme;
+    return t === "dark" || (!t && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  btn.textContent = dark() ? "☀️" : "🌙";
+  btn.addEventListener("click", function () {
+    var el = document.documentElement;
+    el.dataset.theme = dark() ? "light" : "dark";
+    try { localStorage.setItem("rec-theme", el.dataset.theme); } catch (e) {}
+    btn.textContent = dark() ? "☀️" : "🌙";
+  });
+})();
+</script>
+</body>
+</html>

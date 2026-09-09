@@ -1,0 +1,11 @@
+# rubrric-aligned 筛查（v6 融合 macro comp = .58429 为基准）
+
+LGBMRanker(lambdarank, 组=user-month) Jun..Oct:
+   comp_m=0.56346  (v6 融合 .58429，差 -0.02083)
+
+高 LR 权融合（oof_eqg 分量全局秩；LR 轴 = 纯板盲判断）:
+   w=(0.1,0.3,0.6)  comp_m=0.58429
+   w=(0.05,0.2,0.75)  comp_m=0.58293
+   w=(0.0,0.2,0.8)  comp_m=0.58216
+   w=(0.0,0.1,0.9)  comp_m=0.58124
+   w=(0.0,0.0,1.0)  comp_m=0.57974

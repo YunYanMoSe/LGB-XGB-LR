@@ -1,0 +1,22 @@
+# 候选对齐回放 时间序 OOF（前月训练→后月预测，组=user×month）
+# 评估：global AUC / 加权 gAUC / 宏 gAUC / 逐用户 macro top-k（探针口径）
+# 训练月序：['2010-06-01', '2010-07-01', '2010-08-01', '2010-09-01', '2010-10-01']；对目标月只用严格早于它的月份
+
+  LGB[scale_pos] train=2010-06..2010-06 -> eval 2010-07
+  LGB[scale_pos] train=2010-06..2010-07 -> eval 2010-08
+  LGB[scale_pos] train=2010-06..2010-08 -> eval 2010-09
+  LGB[scale_pos] train=2010-06..2010-09 -> eval 2010-10
+  ==> LGB[scale_pos] global_auc=0.8446  gAUC_w=0.8122  gAUC_m=0.8241  n_groups=1013.0000  n_rows=79521.0000  hit@5=0.9267  prec@5=0.5719  rec@5=0.4828  hit@10=0.9532  prec@10=0.4385  rec@10=0.6225  hit@20=0.9756  prec@20=0.3146  rec@20=0.7680
+  LGB[macro] train=2010-06..2010-06 -> eval 2010-07
+  LGB[macro] train=2010-06..2010-07 -> eval 2010-08
+  LGB[macro] train=2010-06..2010-08 -> eval 2010-09
+  LGB[macro] train=2010-06..2010-09 -> eval 2010-10
+  ==> LGB[macro] global_auc=0.8585  gAUC_w=0.8256  gAUC_m=0.8376  n_groups=1013.0000  n_rows=79521.0000  hit@5=0.9246  prec@5=0.5491  rec@5=0.4665  hit@10=0.9572  prec@10=0.4295  rec@10=0.6188  hit@20=0.9837  prec@20=0.3113  rec@20=0.7724
+  LGB[macro_sp] train=2010-06..2010-06 -> eval 2010-07
+  LGB[macro_sp] train=2010-06..2010-07 -> eval 2010-08
+  LGB[macro_sp] train=2010-06..2010-08 -> eval 2010-09
+  LGB[macro_sp] train=2010-06..2010-09 -> eval 2010-10
+  ==> LGB[macro_sp] global_auc=0.8433  gAUC_w=0.8150  gAUC_m=0.8264  n_groups=1013.0000  n_rows=79521.0000  hit@5=0.9328  prec@5=0.5772  rec@5=0.4893  hit@10=0.9593  prec@10=0.4485  rec@10=0.6356  hit@20=0.9735  prec@20=0.3173  rec@20=0.7693
+  ==> LR[balanced] global_auc=0.8659  gAUC_w=0.8296  gAUC_m=0.8409  n_groups=1013.0000  n_rows=79521.0000  hit@5=0.9124  prec@5=0.4448  rec@5=0.4016  hit@10=0.9511  prec@10=0.3538  rec@10=0.5466  hit@20=0.9695  prec@20=0.2645  rec@20=0.6961
+
+总耗时 126s

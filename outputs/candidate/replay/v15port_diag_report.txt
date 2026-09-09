@@ -1,0 +1,18 @@
+[A v14完整(active+split) 融合] composite=0.51586 (GAUC 0.8230 NDCG 0.2105 Rec 0.5123)
+[A v14完整(active+split) 融合]   v6融合=0.56866  Δ=-0.05280
+   A 分量 lgb_macro_eq  : comp=0.55136 | v6同分量=0.54781  Δ=+0.00355
+   A 分量 xgb_macro_eq  : comp=0.55689 | v6同分量=0.56245  Δ=-0.00556
+   A 分量 lr_eq_l2_sp   : comp=0.46417 | v6同分量=0.56211  Δ=-0.09794
+
+[B 仅active过滤(不split)] composite=0.56740 (GAUC 0.8638 NDCG 0.2538 Rec 0.6019)
+[B 仅active过滤(不split)]   v6融合=0.56866  Δ=-0.00127
+
+[C 仅prior切分(不active)] composite=0.48982 (GAUC 0.7971 NDCG 0.1901 Rec 0.4748)
+[C 仅prior切分(不active)]   v6融合=0.56866  Δ=-0.07885
+   C 分量 lgb_macro_eq  : comp=0.53808 | v6同分量=0.54781  Δ=-0.00972
+   C 分量 xgb_macro_eq  : comp=0.54156 | v6同分量=0.56245  Δ=-0.02089
+   C 分量 lr_eq_l2_sp   : comp=0.43592 | v6同分量=0.56211  Δ=-0.12619
+
+[D v6同窗复现(不active不split)] composite=0.56866 (GAUC 0.8632 NDCG 0.2563 Rec 0.6045)
+[D v6同窗复现(不active不split)]   v6融合=0.56866  Δ=+0.00000
+

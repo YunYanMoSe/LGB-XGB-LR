@@ -1,0 +1,100 @@
+{
+  "experiment": "basket_hypergraph_member_route",
+  "author_route": "Basket/Hypergraph Residual (任务书 四)",
+  "dev_protocol": {
+    "08": "debug",
+    "09": "select config+alpha",
+    "freeze": "refit 08+09",
+    "10": "confirm"
+  },
+  "metric": {
+    "composite": "0.4*GAUC+0.4*NDCG@10+0.2*Recall@10",
+    "group": "(user_id, snapshot_month)",
+    "nan_group": "skip"
+  },
+  "anchor": {
+    "source": "data/candidate_aligned_oof_v15.csv",
+    "col": "blend_v15",
+    "overall_composite": 0.57753
+  },
+  "time_safety": "features use transactions strictly before snapshot month cutoff",
+  "basket_def": {
+    "id": "(CustomerID,InvoiceNo)",
+    "dedup": "intra-basket item dedup",
+    "service_codes_excluded": true,
+    "big_basket_norm": "1/sqrt(|B|-1) default"
+  },
+  "seed": 42,
+  "experiments": {
+    "H0_repro": {
+      "status": "pass",
+      "overall_composite": 0.57753,
+      "delta": 0.0
+    },
+    "H1_norm_cooccurrence": {
+      "main_scheme": "cos_bigbasket",
+      "main_col": "sim_last3_mean",
+      "alpha09": 0.0,
+      "ablations_csv": "normalization_ablation.csv",
+      "ablations_alpha09": "all 0.0 / corr 0.92-0.99"
+    },
+    "H2_linear_hypergraph": {
+      "scheme": "hg_linear",
+      "csv": "cooccurrence_vs_hypergraph.csv",
+      "pearson_h1_h2": 0.9987,
+      "spearman_group": 0.9955,
+      "residual_top10_overlap": 0.963,
+      "stop_condition": "4.4 #1 met"
+    },
+    "H3_light_nonlinear_encoder": {
+      "status": "skipped",
+      "reason": "H1/H2 simple baselines null → task-book gating not met"
+    },
+    "H4_constrained_residual": {
+      "csv": "h4_configs.csv",
+      "models": [
+        "lr",
+        "lgb"
+      ],
+      "feature_sets": [
+        "h1_norm_cooc",
+        "h2_linear_hg"
+      ],
+      "fit_ladder": "08->select 09; 08+09 refit->confirm 10",
+      "best_confirm_d10": 3.840777021146824e-05
+    }
+  },
+  "decision": {
+    "adopted_route": "none(keep_anchor)",
+    "alpha_final": 0.0,
+    "confirm_threshold_d": 0.0005,
+    "decided": [
+      {
+        "candidate": "additive_family",
+        "config_detail": "col=simnb_last3_max,alpha=0.002",
+        "d09": 0.0002031436162739375,
+        "d10_confirm": -0.000166483445065424,
+        "adopt": false
+      },
+      {
+        "candidate": "learned_h4",
+        "config_detail": "h2_linear_hg|lgb,alpha=0.002",
+        "d09": 2.431072224873265e-05,
+        "d10_confirm": -1.4679126738137429e-05,
+        "adopt": false
+      }
+    ],
+    "summary": "No basket/hypergraph residual route reached +5e-4 confirm gain; final_score=anchor (alpha=0). residual_score kept for future re-blend."
+  },
+  "artifacts": [
+    "candidate_aligned_oof_basket.csv",
+    "monthly_metrics.csv",
+    "alpha_sweep.csv",
+    "normalization_ablation.csv",
+    "cooccurrence_vs_hypergraph.csv",
+    "repeat_explore_analysis.csv",
+    "residual_col_selection.csv",
+    "h4_configs.csv",
+    "h4_saved_kicked_confirm.csv"
+  ]
+}

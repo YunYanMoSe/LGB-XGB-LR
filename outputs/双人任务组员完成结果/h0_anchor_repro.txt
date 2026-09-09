@@ -1,0 +1,16 @@
+## Exp-H0 复现 anchor：data/candidate_aligned_oof_v15.csv 的 blend_v15
+口径：组=(user, snapshot_month) | composite=0.4*GAUC+0.4*NDCG@10+0.2*Recall@10（scripts/74 同款函数）
+
+### 逐月
+     ym  composite     GAUC  NDCG@10  Recall@10  rows  users  pos
+2010-08   0.597287 0.885444 0.273646   0.668255 45399    625 1627
+2010-09   0.578437 0.861258 0.267367   0.634934 48097    653 2313
+2010-10   0.561304 0.859300 0.250496   0.586929 53034    683 2728
+
+### 整体
+rows=146,530  composite=0.57753  GAUC=0.8675  NDCG@10=0.2630  Recall@10=0.6268
+
+### 与 scripts/74 既有基准对比
+  基准  composite=0.57753  GAUC=0.8675  NDCG@10=0.2630  Recall@10=0.6268
+  复现  composite=0.57753  GAUC=0.8675  NDCG@10=0.2630  Recall@10=0.6268
+  Δcomposite=+0.00000  →  PASS

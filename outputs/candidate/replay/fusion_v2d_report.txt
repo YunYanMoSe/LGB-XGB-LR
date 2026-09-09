@@ -1,0 +1,30 @@
+# v6 候选 OOF（wide_v2；补 XGB 变体 + 细网格）
+
+单 lgb_macro     : AUC=0.8676 gAUC_w=0.8428 gAUC_m=0.8556
+单 lgb_macro_sp  : AUC=0.8542 gAUC_w=0.8286 gAUC_m=0.8415
+单 xgb_macro     : AUC=0.8786 gAUC_w=0.8459 gAUC_m=0.8586
+单 xgb_macro_sp  : AUC=0.8674 gAUC_w=0.8390 gAUC_m=0.8514
+单 xgb_macro_l2  : AUC=0.8772 gAUC_w=0.8434 gAUC_m=0.8560
+单 xgb_macrosp_l2: AUC=0.8686 gAUC_w=0.8364 gAUC_m=0.8486
+单 lr            : AUC=0.8810 gAUC_w=0.8539 gAUC_m=0.8684
+
+== 细网格 (lgb_macro,xgb_macro,lr) step.025 top6（v5=.15/.15/.70→.8710）==
+w=(0.15, 0.15, 0.7)  AUC=0.8854 gAUC_w=0.8571 gAUC_m=0.8710
+w=(0.15, 0.125, 0.725)  AUC=0.8851 gAUC_w=0.8570 gAUC_m=0.8709
+w=(0.15, 0.1, 0.75)  AUC=0.8849 gAUC_w=0.8569 gAUC_m=0.8709
+w=(0.125, 0.15, 0.725)  AUC=0.8853 gAUC_w=0.8570 gAUC_m=0.8709
+w=(0.125, 0.175, 0.7)  AUC=0.8855 gAUC_w=0.8571 gAUC_m=0.8709
+w=(0.1, 0.15, 0.75)  AUC=0.8852 gAUC_w=0.8569 gAUC_m=0.8708
+
+== 三分量细网格 best w=(0.15, 0.15, 0.7) gAUC_m=0.8710 ==
+== 三分量+lgb_macro_sp（step.1）top3 ==
+w=(0.2, 0.1, 0.7, 0.0)  AUC=0.8850 gAUC_w=0.8569 gAUC_m=0.8707
+w=(0.1, 0.2, 0.7, 0.0)  AUC=0.8856 gAUC_w=0.8570 gAUC_m=0.8707
+w=(0.1, 0.1, 0.8, 0.0)  AUC=0.8846 gAUC_w=0.8565 gAUC_m=0.8706
+
+== 三分量+xgb_macro_sp（step.1）top3 ==
+w=(0.1, 0.2, 0.6, 0.1)  AUC=0.8857 gAUC_w=0.8574 gAUC_m=0.8709
+w=(0.2, 0.1, 0.7, 0.0)  AUC=0.8850 gAUC_w=0.8569 gAUC_m=0.8707
+w=(0.1, 0.2, 0.7, 0.0)  AUC=0.8856 gAUC_w=0.8570 gAUC_m=0.8707
+
+== 全场 best gAUC_m=0.8710 w={'lgb_macro': 0.15, 'xgb_macro': 0.15, 'lr': 0.7}（> .8710 才产 v6 提交）==

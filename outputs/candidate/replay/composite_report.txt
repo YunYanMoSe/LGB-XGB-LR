@@ -1,0 +1,56 @@
+# 复合分探针（综合分 = 0.4 GAUC + 0.4 NDCG@10 + 0.2 Recall@10）
+# 真榜序：v6 .7782 > v8-ext .7776 > v7-pooled .7774 ≈ v7-tune .7774
+
+[xx ] GAUCm|NDCGm|Recm         v6-fuse=0.58429  v7-pooled(.075,.55,.375)=0.58465  v7-tune=0.58396  v8-ext=0.58428
+[xx ] GAUCm|NDCGm|Recw         v6-fuse=0.57114  v7-pooled(.075,.55,.375)=0.57151  v7-tune=0.57077  v8-ext=0.57120
+[xx ] GAUCm|NDCGw|Recm         v6-fuse=0.56669  v7-pooled(.075,.55,.375)=0.56708  v7-tune=0.56609  v8-ext=0.56706
+[xx ] GAUCm|NDCGw|Recw         v6-fuse=0.55353  v7-pooled(.075,.55,.375)=0.55394  v7-tune=0.55290  v8-ext=0.55398
+[xx ] GAUCw|NDCGm|Recm         v6-fuse=0.57866  v7-pooled(.075,.55,.375)=0.57919  v7-tune=0.57826  v8-ext=0.57870
+[xx ] GAUCw|NDCGm|Recw         v6-fuse=0.56551  v7-pooled(.075,.55,.375)=0.56606  v7-tune=0.56507  v8-ext=0.56562
+[xx ] GAUCw|NDCGw|Recm         v6-fuse=0.56106  v7-pooled(.075,.55,.375)=0.56162  v7-tune=0.56040  v8-ext=0.56148
+[xx ] GAUCw|NDCGw|Recw         v6-fuse=0.54791  v7-pooled(.075,.55,.375)=0.54848  v7-tune=0.54720  v8-ext=0.54840
+
+== 子分拆解（全等权 macro 口径）：composite/GAUC/NDCG10/Recall10 ==
+v6-fuse  (.1,.3,.6) eqg    0.58429 | 0.87206 0.26943 0.63847
+v7-pooled(.075,.55,.375) eqg 0.58465 | 0.87142 0.26955 0.64131
+v7-tune  (.4,.6) eqt       0.58396 | 0.87224 0.26837 0.63857
+v8-ext   (.15,.225,.625) ext 0.58428 | 0.87199 0.26838 0.64066
+
+== 单分量复合（等权macro 与 曝光加权两口径）==
+eqg Jun池   lgb_macro              comp_m=0.56886 (GAUC 0.8556 NDCG 0.2576 Rec 0.6180) | comp_w=0.53411
+eqg Jun池   lgb_macro_sp           comp_m=0.55570 (GAUC 0.8415 NDCG 0.2484 Rec 0.5987) | comp_w=0.52212
+eqg Jun池   xgb_macro              comp_m=0.57269 (GAUC 0.8586 NDCG 0.2613 Rec 0.6236) | comp_w=0.53764
+eqg Jun池   lr                     comp_m=0.58002 (GAUC 0.8684 NDCG 0.2638 Rec 0.6357) | comp_w=0.54373
+eqg Jun池   xgb_macro_sp           comp_m=0.56530 (GAUC 0.8514 NDCG 0.2556 Rec 0.6126) | comp_w=0.53060
+eqg Jun池   xgb_macro_l2           comp_m=0.56980 (GAUC 0.8560 NDCG 0.2583 Rec 0.6205) | comp_w=0.53505
+eqg Jun池   xgb_macrosp_l2         comp_m=0.56055 (GAUC 0.8486 NDCG 0.2511 Rec 0.6033) | comp_w=0.52622
+eqg Jun池   lgb_macro_eq           comp_m=0.56619 (GAUC 0.8535 NDCG 0.2567 Rec 0.6107) | comp_w=0.53081
+eqg Jun池   xgb_macro_eq           comp_m=0.58043 (GAUC 0.8665 NDCG 0.2667 Rec 0.6356) | comp_w=0.54514
+eqg Jun池   lr_eq_l2_sp            comp_m=0.57974 (GAUC 0.8687 NDCG 0.2632 Rec 0.6348) | comp_w=0.54342
+eqg Jun池   lr_eq_l2               comp_m=0.57842 (GAUC 0.8636 NDCG 0.2665 Rec 0.6319) | comp_w=0.54283
+eqt Jun池   xgb_eq_base            comp_m=0.58043 (GAUC 0.8665 NDCG 0.2667 Rec 0.6356) | comp_w=0.54514
+eqt Jun池   lgb_eq_base            comp_m=0.56619 (GAUC 0.8535 NDCG 0.2567 Rec 0.6107) | comp_w=0.53081
+eqt Jun池   lr_eq_l2_sp            comp_m=0.57974 (GAUC 0.8687 NDCG 0.2632 Rec 0.6348) | comp_w=0.54342
+eqt Jun池   xgb_xb_d5              comp_m=0.58103 (GAUC 0.8671 NDCG 0.2676 Rec 0.6356) | comp_w=0.54585
+eqt Jun池   lgb_lb_base            comp_m=0.56619 (GAUC 0.8535 NDCG 0.2567 Rec 0.6107) | comp_w=0.53081
+eqt Jun池   lr_w2_a1p0_C3p0        comp_m=0.57974 (GAUC 0.8692 NDCG 0.2630 Rec 0.6343) | comp_w=0.54321
+ext Feb池   lgb_macro_eq           comp_m=0.57200 (GAUC 0.8597 NDCG 0.2598 Rec 0.6210) | comp_w=0.53718
+ext Feb池   xgb_macro_eq           comp_m=0.57597 (GAUC 0.8648 NDCG 0.2607 Rec 0.6288) | comp_w=0.54160
+ext Feb池   lr_eq_l2_sp            comp_m=0.58071 (GAUC 0.8694 NDCG 0.2641 Rec 0.6366) | comp_w=0.54409
+
+== 融合权网格重搜（step .05 起；对 eqg Jun..Oct 三分量）==
+-- 口径 GAUCm|NDCGm|Recm：top5 --
+   w=(0.2, 0.55, 0.25)  comp=0.58485
+   w=(0.15, 0.6, 0.25)  comp=0.58475
+   w=(0.2, 0.5, 0.3)  comp=0.58472
+   w=(0.1, 0.7, 0.2)  comp=0.58466
+   w=(0.1, 0.6, 0.3)  comp=0.58466
+   [v6 (0.1,0.3,0.6) 在第 16 名 comp=0.58429]
+-- 口径 GAUCw|NDCGw|Recw：top5 --
+   w=(0.1, 0.7, 0.2)  comp=0.54898
+   w=(0.1, 0.75, 0.15)  comp=0.54890
+   w=(0.15, 0.65, 0.2)  comp=0.54880
+   w=(0.15, 0.6, 0.25)  comp=0.54872
+   w=(0.2, 0.55, 0.25)  comp=0.54867
+   [v6 (0.1,0.3,0.6) 在第 24 名 comp=0.54791]
+

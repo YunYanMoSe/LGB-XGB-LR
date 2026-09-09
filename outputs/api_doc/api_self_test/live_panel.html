@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>API 自测面板</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; color: #1c2430; background: #eef1f5; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 20px; }
+  header h1 { font-size: 17px; margin: 0 0 2px; color: #16324f; }
+  header .sub { font-size: 12px; color: #5b6673; margin-bottom: 10px; }
+  .meta-line { font-size: 12px; color: #46505c; background: #fff; border: 1px solid #d8dee6; border-radius: 8px; padding: 7px 10px; margin-bottom: 10px; }
+  .card { background: #fff; border: 1px solid #d8dee6; border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+  .card .card-h { font-size: 12px; font-weight: 600; color: #33404e; background: #f2f6fb; padding: 6px 12px; border-bottom: 1px solid #e2e8f0; }
+  .card .card-h .tag { font-weight: 700; }
+  .card .body { padding: 10px 12px; }
+  .method { display: inline-block; font-size: 11px; font-weight: 700; color: #fff; background: #1a7f4e; border-radius: 4px; padding: 2px 8px; margin-right: 8px; }
+  .url { font-family: Consolas, 'Courier New', monospace; font-size: 12.5px; color: #0b3d73; word-break: break-all; }
+  .p-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+  .p-table th, .p-table td { text-align: left; padding: 4px 6px; border: 1px solid #e5eaf0; }
+  .p-table th { background: #f4f7fb; color: #46505c; font-weight: 600; width: 22%; }
+  .p-table td code { font-family: Consolas, monospace; font-size: 11.5px; color: #8a2b10; }
+  .status-ok { color: #1a7f4e; }
+  .status-err { color: #c0392b; }
+  .resp-status { font-size: 14px; font-weight: 700; font-family: Consolas, monospace; }
+  .hdr { font-family: Consolas, monospace; font-size: 11px; color: #5b6673; margin: 6px 0 2px; }
+  pre.body { margin: 6px 0 0; font-family: Consolas, 'Courier New', monospace; font-size: 12px; line-height: 1.45; color: #0f2438;
+             background: #f8fafc; border: 1px solid #e5eaf0; border-radius: 6px; padding: 8px 10px; white-space: pre-wrap; word-break: break-all; overflow: auto; }
+  .note { font-size: 11px; color: #7c8896; margin-top: 8px; }
+  #marker { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>推荐系统 API 自测控制台 <span style="font-weight:400;font-size:12px;color:#5b6673">（Postman 同类 · 浏览器 HTTP 客户端）</span></h1>
+    <div class="sub">每次打开页面都会向下方目标接口<b>真实发起一次 HTTP 请求</b>并展示响应 —— 本截图即真实请求/响应记录。</div>
+  </header>
+
+  <div class="meta-line" id="metaLine">…</div>
+
+  <div class="card">
+    <div class="card-h"><span class="tag">请求 REQUEST</span></div>
+    <div class="body">
+      <span class="method" id="mMethod">GET</span>
+      <span class="url" id="mUrl"></span>
+      <table class="p-table" id="pTable"><tr><th>请求参数</th><th>取值</th></tr><tr><td colspan="2">（无查询参数）</td></tr></table>
+      <div class="note" id="reqHeaders">Header：Accept: application/json · 编码：UTF-8</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="tag">响应 RESPONSE</span> <span class="hdr" id="rMeta"></span></div>
+    <div class="body">
+      <div class="resp-status" id="rStatus">… 请求中</div>
+      <div class="hdr" id="rTime"></div>
+      <pre class="body" id="rBody"></pre>
+    </div>
+  </div>
+  <div class="note" id="footNote"></div>
+</div>
+<div id="marker"></div>
+
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var BASE = q.get('base') || 'http://127.0.0.1:5099';
+  var rel = q.get('rel') || '/health';
+  var method = (q.get('method') || 'GET').toUpperCase();
+  var name = q.get('name') || rel;
+  var mark = document.getElementById('marker');
+
+  var reqUrl = BASE + rel;
+  document.getElementById('metaLine').innerHTML =
+    '目标服务：<code style="font-family:Consolas,monospace">' + BASE + '</code>　·　自测用例：<b>' + name + '</b>　·　执行时间：' + new Date().toLocaleString('zh-CN') + '（真实请求）';
+  document.getElementById('mMethod').textContent = method;
+  document.getElementById('mUrl').textContent = reqUrl;
+
+  // 解析查询参数表
+  var qi = rel.indexOf('?');
+  var pTable = document.getElementById('pTable');
+  if (qi >= 0) {
+    var qs = rel.slice(qi + 1).split('&').filter(Boolean);
+    pTable.innerHTML = '<tr><th style="width:30%">请求参数</th><th>取值</th></tr>';
+    qs.forEach(function (kv) {
+      var pair = kv.split('=');
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td><code>' + pair[0] + '</code></td><td><code>' + (pair[1] || '') + '</code></td>';
+      pTable.appendChild(tr);
+    });
+  }
+
+  function finish(markerText, title) {
+    mark.textContent = markerText;
+    document.title = title;
+  }
+
+  var t0 = performance.now();
+  fetch(reqUrl, { method: method, headers: { 'Accept': 'application/json' } })
+    .then(function (resp) {
+      var ct = resp.headers.get('content-type') || '';
+      var cl = resp.headers.get('content-length') || '';
+      return resp.text().then(function (body) {
+        var ms = Math.round(performance.now() - t0);
+        var ok = resp.ok;
+        var st = document.getElementById('rStatus');
+        st.textContent = 'HTTP ' + resp.status + ' ' + (ok ? 'OK' : 'Error');
+        st.className = 'resp-status ' + (ok ? 'status-ok' : 'status-err');
+        document.getElementById('rMeta').textContent = 'Content-Type: ' + ct + (cl ? ' · Content-Length: ' + cl : '');
+        document.getElementById('rTime').textContent = '耗时：' + ms + ' ms';
+        var pre = document.getElementById('rBody');
+        var pretty = body;
+        try { pretty = JSON.stringify(JSON.parse(body), null, 2); } catch (e) { /* 非 JSON 原样显示 */ }
+        pre.textContent = pretty;
+        document.getElementById('footNote').innerHTML = '复现：' +
+          ' 终端执行 <code style="font-family:Consolas,monospace">curl "' + reqUrl + '"</code> 应得到相同响应。';
+        finish((ok ? 'OK ' : 'ERR ') + resp.status, 'R:' + resp.status);
+      });
+    })
+    .catch(function (e) {
+      var ms = Math.round(performance.now() - t0);
+      document.getElementById('rStatus').textContent = '请求失败 Network Error';
+      document.getElementById('rStatus').className = 'resp-status status-err';
+      document.getElementById('rTime').textContent = '耗时：' + ms + ' ms';
+      document.getElementById('rBody').textContent = String(e && e.message ? e.message : e);
+      finish('ERR network', 'R:ERR');
+    });
+})();
+</script>
+</body>
+</html>

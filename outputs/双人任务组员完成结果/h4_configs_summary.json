@@ -1,0 +1,13 @@
+{
+  "seed": 42,
+  "features": [
+    "h1_norm_cooc",
+    "h2_linear_hg"
+  ],
+  "models": [
+    "lr",
+    "lgb"
+  ],
+  "fit_ladder": "08->09 select; 08+09 refit -> 10 confirm",
+  "best_on09_config": "h2_linear_hg|lgb"
+}

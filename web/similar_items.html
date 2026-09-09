@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>相似商品推荐 · ItemCF / CBOW / Skip-gram</title>
+<link rel="stylesheet" href="assets/app.css">
+<script>
+/* 主题：默认跟随系统，手动切换后记住；支持 ?theme=light|dark 一键指定 */
+(function () {
+  var el = document.documentElement;
+  try {
+    var s = localStorage.getItem("rec-theme");
+    if (s) { el.dataset.theme = s; }
+    var q = new URLSearchParams(location.search);
+    if (q.get("theme") === "light") el.dataset.theme = "light";
+    else if (q.get("theme") === "dark") el.dataset.theme = "dark";
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <span class="brand"><span class="dot"></span>推荐系统 · 阶段四/五</span>
+    <span class="spacer"></span>
+    <nav>
+      <a href="index.html">总览</a>
+      <a href="similar_users.html">相似用户</a>
+      <a class="on" href="similar_items.html">相似商品</a>
+    </nav>
+    <button class="theme-toggle" id="themeBtn" title="切换明暗主题" aria-label="切换明暗主题">🌙</button>
+  </header>
+
+  <section class="hero">
+    <h1>输入商品编号 → 得到与它最像的商品</h1>
+    <div class="sub" id="subLine">…</div>
+    <span class="pill" id="methodPill">…</span>
+  </section>
+
+  <section class="search-card">
+    <div class="search-row">
+      <label for="codeInput">商品编号</label>
+      <input class="q" id="codeInput" type="text" autocomplete="off"
+             placeholder="例如 85123A（可下拉选择）" spellcheck="false" list="codes">
+      <button class="go" id="goBtn" type="button">查看相似商品</button>
+    </div>
+    <datalist id="codes"></datalist>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <div class="segrow hidden" id="segrow">
+    <div class="seg" id="seg">
+      <button type="button" data-m="itemcf" class="on">ItemCF · 物品余弦</button>
+      <button type="button" data-m="cbow">CBOW 嵌入</button>
+      <button type="button" data-m="skip">Skip-gram 嵌入</button>
+    </div>
+    <span class="mnote" id="mnote"></span>
+  </div>
+
+  <div class="msg" id="msg"></div>
+
+  <section id="result" class="hidden">
+    <div class="kpis" id="kpis"></div>
+    <div class="panel-head">
+      <h2 id="panelTitle">…</h2>
+      <span class="count" id="panelCount"></span>
+    </div>
+    <div class="rows m-itemcf" id="rows"></div>
+  </section>
+
+  <section class="note analysis">
+    <h2><span class="ic"></span>总结与分析：这个结果该怎么看</h2>
+    <div class="verdict" id="aVerdict"></div>
+    <ul class="find" id="aFind"></ul>
+    <div class="chartbox">
+      <p class="ct">为什么有些冷门商品分数反而顶满？——按「商品被多少位买家买过」分组</p>
+      <p class="cs">柱高 = 每组商品「最像的那个相似商品」的相似度中位数；括号内为该组商品数。</p>
+      <p class="cs2" id="anaScope"></p>
+      <div class="bars" id="aBars"></div>
+      <div class="scale-note">柱高刻度 0–1，虚线 = 0.5</div>
+    </div>
+    <p class="takeaway2" id="aTake"></p>
+  </section>
+
+  <details class="note">
+    <summary>口径与技术细节（选读）</summary>
+    <p><b>口径：</b>本页提供三种「相似商品」的定义，右上角可切换：</p>
+    <ul>
+      <li><b>ItemCF · 物品余弦：</b>把「用户 × 商品」购买矩阵转置，商品成为行向量
+        （分量 = 各用户累计购买数量）。相似度 = 两个商品行向量的<b>余弦值</b>，
+        即「被同一批用户、以相近数量购买」的程度；与相似用户用的是同一张矩阵，行列互换。</li>
+      <li><b>CBOW 嵌入 / Skip-gram 嵌入：</b>把每一笔订单（InvoiceNo）当作一个句子、
+        订单内去重的商品当作词，训练商品向量（Item2Vec，见 README 阶段五）。
+        两种方法分别用 CBOW（用篮内上下文预测商品）与 Skip-gram（用商品预测篮内上下文），
+        向量余弦 = 两件商品「<b>经常被放进同一订单一起买</b>」的程度，偏向系列 / 成套搭配。</li>
+    </ul>
+    <p><b>相似度条按 0–1 真实刻度绘制；三种方法的分数不可互比</b>（ItemCF 更容易出现
+      “只被 1–2 人买过”带来的虚高甚至满格 1.00，CBOW 分值整体偏高而 Skip-gram 偏保守）。</p>
+    <ul>
+      <li><b>同系列换款式/配色</b> —— 如 JUMBO BAG 的不同印花、红/白心形茶蜡台，三种方法一般都能找到。</li>
+      <li><b>同主题搭配品</b> —— ItemCF 找“同一买家画像”，嵌入方法找“同一订单成套”的搭配。</li>
+      <li><b>注意噪声：</b>ItemCF 对低支持共现给分虚高；嵌入方法对从未同单出现的两个爆款会误判。
+        改进方向见「总结与分析」及 README 阶段五。</li>
+    </ul>
+    <p><b>数据与已知特点：</b><span id="dataNote"></span></p>
+    <p id="embedNote" class="hidden"><b>嵌入训练概况：</b><span id="embedNoteTxt"></span></p>
+  </details>
+
+  <footer>清洗后交易 397,884 行 · ItemCF 数据由 scripts/04_build_similar_web.py 生成，
+    嵌入数据由 scripts/06_train_item2vec.py + scripts/07_build_embed_web.py 生成，本页可离线打开</footer>
+</div>
+
+<script src="data/item_sim.js"></script>
+<script src="data/embed_sim.js"></script>
+<script>
+(function () {
+  "use strict";
+  var D = window.ITEM_SIM;
+  var M = D.meta;
+  var E = window.EMBED_SIM || null;      // 嵌入数据：CBOW / Skip-gram
+  var vocab = new Set();
+  if (E) { E.vocab.forEach(function (c) { vocab.add(c); }); }
+
+  /* ---------- 三种相似口径 ---------- */
+  var METHODS = {
+    itemcf: {
+      full: "ItemCF · 物品余弦（同一批买家的购买画像）",
+      cap: "同一批用户的购买画像 · 余弦相似度 · 相似度 > 0",
+      note: "相似 = 两件商品被同一批用户、以相近数量购买（用户画像重叠，含“同款换色”和偶发共买）。"
+    },
+    cbow: {
+      full: "CBOW 嵌入 · 词向量余弦（每笔订单 = 一个句子）",
+      cap: "同订单共现语义 · CBOW 向量余弦 · 相似度 > 0",
+      note: "每笔订单=一个句子训练 CBOW；相似 = 常被放进同一订单一起买，偏系列/成套搭配。"
+    },
+    skip: {
+      full: "Skip-gram 嵌入 · 词向量余弦（每笔订单 = 一个句子）",
+      cap: "同订单共现语义 · Skip-gram 向量余弦 · 相似度 > 0",
+      note: "每笔订单=一个句子训练 Skip-gram；相似 = 常被放进同一订单一起买，偏系列/成套搭配。"
+    }
+  };
+  var cur = "itemcf";
+  var lastCode = null;
+
+  /* ---------- 说明注入 ---------- */
+  var nI = M.nItems.toLocaleString("en-US"), nU = M.nUsers.toLocaleString("en-US"),
+      nz = M.nnz.toLocaleString("en-US");
+  document.getElementById("subLine").textContent =
+    "为清洗后数据集中的全部 " + nI + " 种商品离线算好三套 Top-" + M.topK +
+    " 相似商品（ItemCF / CBOW / Skip-gram），输入编号即可对比三种“相似”的不同含义。";
+  document.getElementById("methodPill").textContent = METHODS.itemcf.full;
+  document.getElementById("dataNote").textContent =
+    "商品共 " + nI + " 种，中位购买者约 40 人，其中 179 种只有 1 位买家；ItemCF 的 Top1 相似度中位 " +
+    "0.71（明显高于用户侧），因为热门商品会与大量商品共享买家，且低支持的共现会得到虚高余弦——" +
+    "例如仅 1 人购买的 84387A 仍出现在约 195 个商品的相似列表里。";
+  if (E) {
+    document.getElementById("embedNote").classList.remove("hidden");
+    var rec = E.meta.records;
+    var hyper = E.meta.hyper;
+    document.getElementById("embedNoteTxt").textContent =
+      "购物篮语料 " + (rec.cbow ? rec.cbow.n_baskets.toLocaleString() : "?") + " 个订单，词表 " +
+      E.meta.vocabSize.toLocaleString() + "；两种方法共用超参：向量维数 " + hyper.vector_size +
+      "、窗口 " + hyper.window + "、min_count " + hyper.min_count + "、负采样 " + hyper.negative +
+      "、下采样 " + hyper.sample + "、训练 " + hyper.epochs + " epoch（详见 outputs/item2vec/）。";
+  }
+
+  /* ---------- 主题 ---------- */
+  var themeBtn = document.getElementById("themeBtn");
+  function resolvedDark() {
+    var t = document.documentElement.dataset.theme;
+    if (t === "dark") return true;
+    if (t === "light") return false;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function paint() { themeBtn.textContent = resolvedDark() ? "☀️" : "🌙"; }
+  themeBtn.addEventListener("click", function () {
+    var el = document.documentElement;
+    el.dataset.theme = resolvedDark() ? "light" : "dark";
+    try { localStorage.setItem("rec-theme", el.dataset.theme); } catch (e) {}
+    paint();
+  });
+  paint();
+
+  /* ---------- 下拉候选 ---------- */
+  var codesEl = document.getElementById("codes");
+  Object.keys(D.cat).forEach(function (code) {
+    var o = document.createElement("option");
+    o.value = code + " — " + D.cat[code].desc.slice(0, 30);
+    codesEl.appendChild(o);
+  });
+
+  /* ---------- 方法切换 ---------- */
+  var segrow = document.getElementById("segrow");
+  if (E) segrow.classList.remove("hidden");
+  var seg = document.getElementById("seg");
+  var mnote = document.getElementById("mnote");
+  var pill = document.getElementById("methodPill");
+  var anaScope = document.getElementById("anaScope");
+
+  function syncMethodUI() {
+    Array.prototype.forEach.call(seg.querySelectorAll("button"), function (b) {
+      b.classList.toggle("on", b.getAttribute("data-m") === cur);
+    });
+    mnote.textContent = METHODS[cur].note;
+    pill.textContent = METHODS[cur].full;
+    anaScope.textContent = cur === "itemcf"
+      ? "图表口径 = ItemCF 的 Top1 分数（按购买者数分组）。"
+      : "图表口径是 ItemCF 的分数；下方列表当前为「" + (cur === "cbow" ? "CBOW" : "Skip-gram") +
+        "」嵌入相似，分数不可与 ItemCF 直接比较。";
+  }
+  seg.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b || b.getAttribute("data-m") === cur) return;
+    cur = b.getAttribute("data-m");
+    syncMethodUI();
+    if (lastCode) render(lastCode);   // 重新按当前口径渲染
+  });
+
+  /* ---------- 查询 ---------- */
+  var input = document.getElementById("codeInput");
+  var msg = document.getElementById("msg");
+  var resultSec = document.getElementById("result");
+  var kpis = document.getElementById("kpis");
+  var rowsEl = document.getElementById("rows");
+  var panelTitle = document.getElementById("panelTitle");
+  var panelCount = document.getElementById("panelCount");
+
+  function showMsg(text, isErr) {
+    msg.textContent = text;
+    msg.classList.toggle("err", !!isErr);
+    msg.classList.add("show");
+  }
+  function hideMsg() { msg.classList.remove("show"); }
+  function tile(k, v, extra) {
+    return '<div class="tile"><div class="k">' + k + '</div><div class="v' +
+      (String(v).length > 9 ? " small" : "") + '">' + v + "</div>" +
+      (extra ? '<div class="desc">' + extra + "</div>" : "") + "</div>";
+  }
+  function price(p) { return "£" + Number(p).toFixed(2); }
+
+  function query(raw) {
+    var code = String(raw).trim();
+    if (code.indexOf(" — ") >= 0) code = code.split(" — ")[0].trim();
+    code = code.toUpperCase();
+    if (!code) { showMsg("请输入商品编号，例如 85123A。", true); return; }
+    var info = D.cat[code];
+    if (!info) {
+      var hits = Object.keys(D.cat).filter(function (c) {
+        return c.indexOf(code) === 0 || D.cat[c].desc.toUpperCase().indexOf(code) >= 0;
+      }).slice(0, 5);
+      var hint = hits.length ? "；近似匹配： " + hits.join("、") : "";
+      showMsg("数据中不存在商品编号 " + code + "（数据集共 " + nI + " 种商品）" + hint + "。", true);
+      resultSec.classList.add("hidden");
+      return;
+    }
+    hideMsg();
+    input.value = code;
+    render(code);
+  }
+
+  function recFor(code) {
+    if (cur === "itemcf") return D.rec[code] || [];
+    return (E && E.rec[cur] && E.rec[cur][code]) || [];
+  }
+
+  function render(code) {
+    lastCode = code;
+
+    rowsEl.classList.toggle("m-skip", cur === "skip");
+    rowsEl.classList.toggle("m-cbow", cur === "cbow");
+    rowsEl.classList.toggle("m-itemcf", cur === "itemcf");
+
+    var info = D.cat[code];
+    var rec = recFor(code);
+    var top1 = rec.length ? rec[0][1] : 0;
+
+    kpis.innerHTML =
+      tile("目标商品", code, info.desc) +
+      tile("相似商品数 (>0)", rec.length ? rec.length : 0) +
+      tile("Top1 相似度", rec.length ? top1.toFixed(4) : "—") +
+      tile("购买用户", info.buyers + " 人") +
+      tile("累计销量", info.units + " 件") +
+      tile("中位单价", price(info.price));
+
+    panelTitle.textContent = "商品 " + code + " 的相似商品";
+    panelCount.textContent = "按「" + METHODS[cur].cap + "」降序 · Top-" + M.topK;
+    resultSec.classList.remove("hidden");
+
+    // 嵌入口径下该商品无向量：显示空态 + 引导，分段按钮仍真实反映当前口径
+    if (cur !== "itemcf" && !vocab.has(code)) {
+      rowsEl.innerHTML =
+        '<div class="empty">商品 <b>' + code + '</b> 在嵌入训练语料中出现不足 min_count=' +
+        (E ? E.meta.hyper.min_count : 5) + " 次，没有 CBOW / Skip-gram 向量。" +
+        "<br>可切回 <b>ItemCF</b> 用「买家画像」看它的相似，或换一个出现次数多的热门商品（试试下方小按钮）。</div>";
+      return;
+    }
+
+    if (!rec.length) {
+      rowsEl.innerHTML = "";
+      showMsg("未找到相似商品：该商品没有被第二个人同时买过，缺乏共现信号。", true);
+      return;
+    }
+
+    var html = "";
+    rec.forEach(function (r, i) {
+      var nb = r[0], sc = r[1];
+      var ci = D.cat[nb];
+      var name = ci ? ci.desc : "(无描述)";
+      var meta = ci ? ("买家 " + ci.buyers + " 人 · " + price(ci.price)) : nb;
+      html +=
+        '<div class="row">' +
+          '<div class="rank">#' + (i + 1) + "</div>" +
+          '<div class="who"><div class="name">' + name + "</div>" +
+            '<div class="meta"><span class="id mono">' + nb + "</span> · " + meta + "</div></div>" +
+          '<div class="sim-track"><div class="sim-fill" style="width:' +
+            Math.max(1.5, sc * 100).toFixed(2) + '%"></div></div>' +
+          '<div class="score">' + sc.toFixed(4) + '<span class="u">相似度</span></div>' +
+          '<button class="drill" data-code="' + nb + '" type="button">查它的相似</button>' +
+        "</div>";
+    });
+    rowsEl.innerHTML = html;
+  }
+
+  function go() { query(input.value); }
+  document.getElementById("goBtn").addEventListener("click", go);
+  input.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+  rowsEl.addEventListener("click", function (e) {
+    var b = e.target.closest("button.drill");
+    if (!b) return;
+    query(b.getAttribute("data-code"));
+    input.focus();
+  });
+
+  /* ---------- 总结与分析 ---------- */
+  function renderAnalysis() {
+    var A = D.meta.analysis;
+    if (!A || !A.buckets) return;
+    var b = A.buckets;
+    document.getElementById("aVerdict").innerHTML =
+      "<b>一句话：</b>「相似商品」混着两类关系——<b>同款换色 / 换图案</b>（真·相似，如 JUMBO BAG 不同印花之间 0.75–0.90）" +
+      "和<b>常被一起买</b>（搭配款，如烘焙套装配擀面杖）。整体分数比用户相似高（Top1 中位 <b>" +
+      A.medTop1.toFixed(2) + "</b>）；但要小心冷门：只被 <b>1 个人</b>买过的 <b>" +
+      A.oneBuyer + " 种</b>商品，Top1 中位是满格 <b>1.00</b>——那不是像，而是“唯一的买家顺带买了它”。";
+    document.getElementById("aFind").innerHTML =
+      "<li><b>Top1 相似度中位 ≈ " + A.medTop1.toFixed(2) + "</b>：高于用户侧（0.50），因为商品比用户更容易共享买家。</li>" +
+      "<li><b>" + A.oneBuyer + " 种商品只有 1 位买家</b>：分数常拿满格 1.00，只是单一共现的噪音，不可信。</li>" +
+      "<li><b>支持度适中的商品分数反而最低</b>（6–30 位买家，中位 " + b[2][2].toFixed(2) + "）：信号真实但交集仍小；" +
+      "而 &gt;200 位买家的爆款又回升到 " + b[4][2].toFixed(2) + "——“和谁都像”的热度假象。</li>";
+    document.getElementById("aBars").innerHTML = b.map(function (x) {
+      var h = Math.max(2, Math.round(x[2] * 100));
+      return '<div class="col"><div class="val">' + x[2].toFixed(2) + '</div>' +
+        '<div class="fill" style="height:' + h + '%"></div>' +
+        '<div class="lab">' + x[0] + '<small>' + x[1] + " 种商品</small></div></div>";
+    }).join("");
+    document.getElementById("aTake").innerHTML =
+      "<b>看懂它：</b>最左柱（只有 1 位买家）几乎顶满，是“唯一买家买了别的”造成的假象；" +
+      "真正可信的是同系列、同主题、且有一定共同买家支撑的相似。上线做“看了又看”时，" +
+      "应给相似对加“最小共同买家数”门槛，或用同一订单内共现 + Lift / Item2Vec 嵌入替换原始余弦" +
+      "（两种嵌入就藏在右上角切换栏里）。";
+  }
+  renderAnalysis();
+  syncMethodUI();   // 写入口径说明（segrow 隐藏时亦无害）
+
+  /* URL 直达：?code=85123A&m=cbow（一键定位某一商品/口径，也用于无头浏览器截图）*/
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (qs.get("m") && E && METHODS[qs.get("m")]) { cur = qs.get("m"); syncMethodUI(); }
+    if (qs.get("code")) { query(qs.get("code")); }
+  } catch (e3) {}
+
+  /* 试试按钮 */
+  var chips = document.getElementById("chips");
+  M.samples.forEach(function (code) {
+    var ci = D.cat[code];
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.innerHTML = code + " <small>· " + (ci ? ci.desc.slice(0, 18) : "") + "</small>";
+    b.addEventListener("click", function () { query(code); });
+    chips.appendChild(b);
+  });
+
+  input.focus();
+})();
+</script>
+</body>
+</html>

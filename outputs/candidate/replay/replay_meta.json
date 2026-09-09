@@ -1,0 +1,81 @@
+{
+  "method": "candidate-aligned temporal replay (leader v9)",
+  "months": [
+    {
+      "month": "2010-06-01",
+      "samples": 38005,
+      "pos": 1562,
+      "new": 432,
+      "file": "wide_2010-06.csv"
+    },
+    {
+      "month": "2010-07-01",
+      "samples": 41200,
+      "pos": 1625,
+      "new": 426,
+      "file": "wide_2010-07.csv"
+    },
+    {
+      "month": "2010-08-01",
+      "samples": 45399,
+      "pos": 1627,
+      "new": 454,
+      "file": "wide_2010-08.csv"
+    },
+    {
+      "month": "2010-09-01",
+      "samples": 48097,
+      "pos": 2313,
+      "new": 779,
+      "file": "wide_2010-09.csv"
+    },
+    {
+      "month": "2010-10-01",
+      "samples": 53034,
+      "pos": 2728,
+      "new": 1044,
+      "file": "wide_2010-10.csv"
+    }
+  ],
+  "total_samples": 225735,
+  "total_pos": 9855,
+  "pos_rate": 0.04365738587281547,
+  "features": [
+    "u_n_orders_log",
+    "u_n_items_log",
+    "u_qty_log",
+    "u_spend_log",
+    "u_avg_unit_price_log",
+    "u_avg_basket_size_log",
+    "u_active_days_log",
+    "u_last_active_gap_log",
+    "u_weekend_ratio",
+    "u_cat_entropy",
+    "i_pop_buyers_log",
+    "i_pop_orders_log",
+    "i_qty_log",
+    "i_price_log",
+    "i_pop_rank_frac",
+    "i_first_gap_log",
+    "i_last_gap_log",
+    "i_cat_sales_log",
+    "i_cat_sales_share",
+    "i_top_weekday_code",
+    "ui_cat_lift_log",
+    "ui_price_gap_log",
+    "ui_emb_sim",
+    "ui_cf_sim",
+    "ui_nn_hit_rate",
+    "country_uk",
+    "country_de",
+    "country_fr",
+    "country_eire",
+    "country_other",
+    "cat_code_ordinal",
+    "ui_owned",
+    "ui_owned_recency_log"
+  ],
+  "n_features": 33,
+  "clean_note": "leader cleaning (keep service codes), clean=327827",
+  "label": "real purchase in label month (含复购)"
+}

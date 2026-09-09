@@ -1,0 +1,44 @@
+{
+  "item_id": "85123A",
+  "method": "itemcf",
+  "query": {
+    "buyers": 856,
+    "category": "家居装饰",
+    "code": "85123A",
+    "desc": "WHITE HANGING HEART T-LIGHT HOLDER",
+    "desc_zh": "奶油色悬挂心形茶烛台",
+    "price": 2.95
+  },
+  "similar": [
+    {
+      "buyers": 385,
+      "category": "家居装饰",
+      "code": "21733",
+      "desc": "RED HANGING HEART T-LIGHT HOLDER",
+      "desc_zh": "红色悬挂心形茶烛台",
+      "price": 2.95,
+      "rank": 1,
+      "score": 0.5435
+    },
+    {
+      "buyers": 252,
+      "category": "装饰品",
+      "code": "22804",
+      "desc": "CANDLEHOLDER PINK HANGING HEART",
+      "desc_zh": "粉色悬挂心形茶烛台",
+      "price": 2.95,
+      "rank": 2,
+      "score": 0.4931
+    },
+    {
+      "buyers": 485,
+      "category": "家居装饰",
+      "code": "22470",
+      "desc": "HEART OF WICKER LARGE",
+      "desc_zh": "大号柳编心形装饰",
+      "price": 2.95,
+      "rank": 3,
+      "score": 0.4113
+    }
+  ]
+}

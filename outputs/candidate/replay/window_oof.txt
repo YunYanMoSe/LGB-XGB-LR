@@ -1,0 +1,11 @@
+# 窗口/衰减 OOF（wide_v2；基准：lgb_macro gAUC_m .8556；lr(macro_sp) .8670）
+lgb_macro all/α=0   gAUC_w=0.8428  gAUC_m=0.8556
+lgb_macro last3     gAUC_w=0.8428  gAUC_m=0.8550
+lgb_macro last2     gAUC_w=0.8385  gAUC_m=0.8512
+lgb_macro α=0.3     gAUC_w=0.8404  gAUC_m=0.8530
+lgb_macro α=0.8     gAUC_w=0.8386  gAUC_m=0.8520
+lr        all/α=0   gAUC_w=0.8530  gAUC_m=0.8669
+lr        last3     gAUC_w=0.8538  gAUC_m=0.8679
+lr        last2     gAUC_w=0.8539  gAUC_m=0.8684
+lr        α=0.3     gAUC_w=0.8537  gAUC_m=0.8679
+lr        α=0.8     gAUC_w=0.8539  gAUC_m=0.8684

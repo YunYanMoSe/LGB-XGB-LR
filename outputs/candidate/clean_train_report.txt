@@ -1,0 +1,20 @@
+train.csv 清洗报告（候选集打分任务原料）
+========================================================
+数据源    : train.csv（utf-8）
+清洗前行数 : 332,848
+① 完全重复行删除 : 5,021（字段全同）
+② 服务码黑名单删除: 1,115 行 / 10 种码
+   删除的服务码  : ADJUST, ADJUST2, BANK CHARGES, C2, D, M, PADS, POST, TEST001, TEST002
+   其中描述含 audit 关键词行 : 660（仅审计，非删除依据）
+清洗后行数 : 326,712
+剩余字段   : InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country
+时间范围   : 2009-12-01 ~ 2010-10-31
+剩余用户数 : 3,913
+剩余商品数 : 3,940
+剩余订单数 : 15,622
+校验: 326,712 = 332,848 - 5,021 - 1,115 → True
+校验: CustomerID 无缺失 = True
+校验: Quantity>0 = True  UnitPrice>0 = True
+校验: 已删除服务码在 clean_train 残留 = False
+输出     : D:\0000\recommender_project\data\processed\clean_train.csv
+耗时     : 1.5s

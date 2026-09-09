@@ -1,0 +1,12 @@
+{
+  "components": [
+    "lgb_macro",
+    "xgb_macro",
+    "lr"
+  ],
+  "weights": {
+    "lgb_macro": 0.15,
+    "xgb_macro": 0.15,
+    "lr": 0.7
+  }
+}

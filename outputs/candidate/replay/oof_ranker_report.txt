@@ -1,0 +1,10 @@
+# LGBMRanker(group=user×month) v2 OOF；目标月 Jul-Oct；与 lgb_macro 对照
+# lgb_macro(scripts/34): global_auc=.8676 gAUC_w=.8428 gAUC_m=.8556 rec@10=.6320 hit@10=.9715
+
+  Ranker train=2010-06..2010-06 -> eval 2010-07
+  Ranker train=2010-06..2010-07 -> eval 2010-08
+  Ranker train=2010-06..2010-08 -> eval 2010-09
+  Ranker train=2010-06..2010-09 -> eval 2010-10
+LGBMRanker global_auc=0.8530  gAUC_w=0.8371  gAUC_m=0.8505  hit@5=0.9328  prec@5=0.4872  rec@5=0.4278  hit@10=0.9593  prec@10=0.3772  rec@10=0.5768  hit@20=0.9817  prec@20=0.2767  rec@20=0.7317
+
+总耗时 93s

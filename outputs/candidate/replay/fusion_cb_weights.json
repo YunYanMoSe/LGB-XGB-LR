@@ -1,0 +1,17 @@
+{
+  "components": [
+    "lgb_macro_eq",
+    "xgb_macro_eq",
+    "cb_macro_eq",
+    "lr_eq_l2_sp"
+  ],
+  "weights": {
+    "lgb_macro_eq": 0.1,
+    "xgb_macro_eq": 0.3,
+    "cb_macro_eq": 0.0,
+    "lr_eq_l2_sp": 0.6
+  },
+  "auc": 0.8872418460699015,
+  "gAUC_w": 0.8579907306896343,
+  "gAUC_m": 0.8720619351010388
+}

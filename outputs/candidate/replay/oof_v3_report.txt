@@ -1,0 +1,9 @@
+# v3 OOF（47 特征，wide_v3_*）
+# 对照 v2：lgb_macro AUC .8676 gAUC_m .8556；lr AUC .8812 gAUC_m .8659
+
+LGB[scale_pos] global_auc=0.8541  gAUC_w=0.8313  gAUC_m=0.8442  n_groups=1013.0000  hit@5=0.9369  prec@5=0.5605  rec@5=0.4841  hit@10=0.9674  prec@10=0.4320  rec@10=0.6348  hit@20=0.9857  prec@20=0.3067  rec@20=0.7779
+LGB[macro] global_auc=0.8662  gAUC_w=0.8420  gAUC_m=0.8542  n_groups=1013.0000  hit@5=0.9389  prec@5=0.5360  rec@5=0.4639  hit@10=0.9695  prec@10=0.4214  rec@10=0.6294  hit@20=0.9817  prec@20=0.3019  rec@20=0.7697
+LGB[macro_sp] global_auc=0.8547  gAUC_w=0.8312  gAUC_m=0.8442  n_groups=1013.0000  hit@5=0.9450  prec@5=0.5666  rec@5=0.4921  hit@10=0.9695  prec@10=0.4365  rec@10=0.6482  hit@20=0.9878  prec@20=0.3087  rec@20=0.7819
+LR[balanced] global_auc=0.8811  gAUC_w=0.8517  gAUC_m=0.8654  n_groups=1013.0000  hit@5=0.9185  prec@5=0.4395  rec@5=0.4063  hit@10=0.9532  prec@10=0.3456  rec@10=0.5509  hit@20=0.9796  prec@20=0.2594  rec@20=0.7089
+
+总耗时 159s
